@@ -1,0 +1,17 @@
+[package]
+
+name = "rustcql"
+version = "0.0.1"
+authors = ["Maxim Baranov <sprayrules@gmail.com>"]
+
+
+keywords = ["cassandra", "cql", "database", "driver"]
+
+
+[dependencies.uuid]
+
+git = "https://github.com/rust-lang/uuid"
+
+[dependencies.byteorder]
+
+git = "https://github.com/BurntSushi/byteorder"
