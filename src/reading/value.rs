@@ -1,6 +1,4 @@
-extern crate uuid;
-
-use self::uuid::Uuid;
+use uuid::Uuid;
 
 use std::io::{
 	Read,

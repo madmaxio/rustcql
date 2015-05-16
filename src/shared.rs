@@ -75,7 +75,7 @@ pub struct Row {
   pub columns: HashMap<String, Column>
 }
 
-#[derive(Copy, FromPrimitive, Debug, Clone)]
+#[derive(Copy, Debug, Clone)]
 pub enum ColumnType {
 	Custom = 0x0000,
 	Ascii = 0x0001,
@@ -97,6 +97,32 @@ pub enum ColumnType {
 	List = 0x0020,
 	Map = 0x0021,
 	Set = 0x0022
+}
+
+pub fn to_column_type(value: u16) -> ColumnType {
+	match value {		
+		0x0000 => ColumnType::Custom,
+		0x0001 => ColumnType::Ascii,
+		0x0002 => ColumnType::Bigint,
+		0x0003 => ColumnType::Blob,
+		0x0004 => ColumnType::Boolean,
+		0x0005 => ColumnType::Counter,
+		0x0006 => ColumnType::Decimal,
+		0x0007 => ColumnType::Double,
+		0x0008 => ColumnType::Float,
+		0x0009 => ColumnType::Int,
+		0x000A => ColumnType::Text,
+		0x000B => ColumnType::Timestamp,
+		0x000C => ColumnType::Uuid,
+		0x000D => ColumnType::Varchar,
+		0x000E => ColumnType::Varint,
+		0x000F => ColumnType::Timeuuid,
+		0x0010 => ColumnType::Inet,
+		0x0020 => ColumnType::List,
+		0x0021 => ColumnType::Map,
+		0x0022 => ColumnType::Set, 
+		_ => ColumnType::Varchar
+	}
 }
 
 #[derive(Debug, Clone)]

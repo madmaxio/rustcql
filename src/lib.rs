@@ -1,6 +1,7 @@
-#![feature(core, convert)]
+#![feature(core, convert, buf_stream)]
 
 extern crate byteorder;
+extern crate uuid;
 
 pub mod shared;
 
@@ -59,7 +60,7 @@ impl Client {
 
 pub fn connect(addr: String) -> Result<Client> {
 
-  let stream = try!(TcpStream::connect(addr.as_slice()));
+  let stream = try!(TcpStream::connect(&*addr));
 
   let startup_msg = startup_request();
   let mut buf = BufStream::new(stream);
