@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use time::*;
+
 pub static CQL_BINARY_PROTOCOL_VERSION:u8 = 0x03;
 
 #[derive(Clone, Copy)]
@@ -133,6 +135,7 @@ pub enum Column {
 	CqlBigint(i64),
 	CqlFloat(f32),
 	CqlDouble(f64),
+	CqlTimestamp(Tm),
 	Set(Vec<Column>),
 	List(Vec<Column>),
 	Map(Vec<(Column, Column)>)

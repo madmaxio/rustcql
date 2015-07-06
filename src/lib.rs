@@ -1,5 +1,6 @@
 #![feature(core, convert, buf_stream)]
 
+extern crate time;
 extern crate byteorder;
 extern crate uuid;
 
@@ -24,6 +25,8 @@ use std::io::{
 use std::net::TcpStream;
 use std::collections::HashMap;
 use std::convert::AsRef;
+
+use time::*;
 
 use shared::{
 	Request,
@@ -86,6 +89,9 @@ pub fn connect(addr: String) -> Result<Client> {
   }
 }
 
+pub fn now_str() -> String {
+	now_utc().rfc3339().to_string()
+}
 
 pub fn test1() {
   let mut client = connect("10.0.2.15:9042".to_string()).unwrap();

@@ -8,6 +8,11 @@ authors = ["Maxim Baranov <sprayrules@gmail.com>"]
 keywords = ["cassandra", "cql", "database", "driver"]
 
 
+
+[dependencies.time]
+
+git = "https://github.com/rust-lang/time"
+
 [dependencies.uuid]
 
 git = "https://github.com/rust-lang/uuid"

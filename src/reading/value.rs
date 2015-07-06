@@ -1,3 +1,5 @@
+use time::*;
+
 use uuid::Uuid;
 
 use std::io::{
@@ -42,6 +44,8 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 			let uuid = Uuid::from_bytes(bytes.as_slice()).unwrap();
 			Column::CqlString(uuid.to_hyphenated_string())
 		}
+		ColumnType::Timestamp =>
+			Column::CqlTimestamp(get_tm(buf.read_i64::<BigEndian>().unwrap())),
 
 		ColumnType::Set => {
 
@@ -131,10 +135,19 @@ fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column
 			let bytes = read_fixed(buf, len as usize);
 			Column::CqlString(Uuid::from_bytes(bytes.as_slice()).unwrap().to_hyphenated_string())
 		}
+		ColumnType::Timestamp =>
+			Column::CqlTimestamp(get_tm(buf.read_i64::<BigEndian>().unwrap())),
 		_ => {
 			let bytes = read_fixed(buf, len as usize);
 			Column::CqlString(String::from_utf8(bytes).unwrap())
 		}
 	}
 
+}
+
+fn get_tm(ts: i64) -> Tm {
+	let s = (ts / 1000) as i64;
+	let ns = (ts % 1000) as i32;
+	let tsp = Timespec::new(s, ns);
+	at_utc(tsp)
 }
