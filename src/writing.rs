@@ -9,7 +9,8 @@ use byteorder::{WriteBytesExt, BigEndian};
 
 use shared::{
 	CQL_BINARY_PROTOCOL_VERSION,
-	Request
+	Request,
+	QueryFlag
 };
 
 
@@ -39,13 +40,30 @@ fn write_message(&mut self, message: &Request) -> Result<()> {
 					try!(buf.write_u16::<BigEndian>(val.len() as u16));
 					try!(Write::write(&mut buf, val.as_bytes()));
 				}
-		},
+			}
 			Request::Query(ref query, ref consistency) => {
-				try!(buf.write_u32::<BigEndian>(query.len() as u32));
+				try!(buf.write_i32::<BigEndian>(query.len() as i32));
 				try!(Write::write(&mut buf, query.as_bytes()));
 				try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
 				try!(WriteBytesExt::write_u8(&mut buf, 0 as u8));
-		},
+			}
+			Request::ValuesQuery(ref query, ref consistency) => {
+				try!(buf.write_i32::<BigEndian>(query.len() as i32));
+				try!(Write::write(&mut buf, query.as_bytes()));
+				try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
+
+				try!(WriteBytesExt::write_u8(&mut buf, 0 | QueryFlag::Values as u8));
+
+				let prm = "hi".to_string();
+
+				try!(buf.write_u16::<BigEndian>(2 as u16));
+
+				try!(buf.write_i32::<BigEndian>(prm.len() as i32));
+				try!(Write::write(&mut buf, prm.as_bytes()));
+
+				try!(buf.write_i32::<BigEndian>(prm.len() as i32));
+				try!(Write::write(&mut buf, prm.as_bytes()));
+			}
 			_ => ()
 		}
 

@@ -58,6 +58,13 @@ impl Client {
 
     Ok(try!(self.buf.read_message()))
   }
+  pub fn values_query(&mut self, query: String, consistency: Consistency) -> Result<Response> {
+    let query = Request::ValuesQuery(query, consistency);
+    try!(self.buf.write_message(&query));
+    try!(self.buf.flush());
+
+    Ok(try!(self.buf.read_message()))
+  }
 }
 
 
