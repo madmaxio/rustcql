@@ -37,7 +37,7 @@ pub enum Request {
   Startup(HashMap<String, String>),
   Options,
   Query(String, Consistency),
-  ValuesQuery(String, Consistency)
+  ValuesQuery(String, Vec<Column>, Consistency)
 }
 
 impl Request {
@@ -45,7 +45,7 @@ impl Request {
     match *self {
       Request::Startup(_) => 0x01,
       Request::Options => 0x05,
-      Request::Query(_, _) | Request::ValuesQuery(_, _)  => 0x07,
+      Request::Query(_, _) | Request::ValuesQuery(_, _, _)  => 0x07,
     }
   }
 }

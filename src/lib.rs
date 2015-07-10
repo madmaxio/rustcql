@@ -7,19 +7,19 @@ extern crate uuid;
 pub mod shared;
 
 pub mod reading {
-	pub mod reader;
-	pub mod spec;
-	pub mod value;
+  pub mod reader;
+  pub mod spec;
+  pub mod value;
 }
 
 pub mod writing;
 
 use std::io::{
-	BufStream,
-	Result,
-	Error,
-	ErrorKind,
-	Write
+  BufStream,
+  Result,
+  Error,
+  ErrorKind,
+  Write
 };
 
 use std::net::TcpStream;
@@ -29,9 +29,10 @@ use std::convert::AsRef;
 use time::*;
 
 use shared::{
-	Request,
-    Consistency,
-    Response
+  Request,
+  Consistency,
+  Response,
+  Column
 };
 
 
@@ -58,8 +59,8 @@ impl Client {
 
     Ok(try!(self.buf.read_message()))
   }
-  pub fn values_query(&mut self, query: String, consistency: Consistency) -> Result<Response> {
-    let query = Request::ValuesQuery(query, consistency);
+  pub fn values_query(&mut self, query: String, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
+    let query = Request::ValuesQuery(query, values, consistency);
     try!(self.buf.write_message(&query));
     try!(self.buf.flush());
 
