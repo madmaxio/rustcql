@@ -18,11 +18,11 @@ use shared::{
 
 
 pub trait WriteMessage {
-	fn write_message(&mut self, &Request) -> Result<()>;
+	fn write_message(&mut self, Request) -> Result<()>;
 }
 
 impl<W: Write> WriteMessage for W {
-fn write_message(&mut self, message: &Request) -> Result<()> {
+fn write_message(&mut self, message: Request) -> Result<()> {
 	let mut header = Vec::new();
 
 	try!(WriteBytesExt::write_u8(&mut header, CQL_BINARY_PROTOCOL_VERSION));
@@ -33,7 +33,7 @@ fn write_message(&mut self, message: &Request) -> Result<()> {
 
 	let mut buf = Vec::new();
 
-	match *message {
+	match message {
 			Request::Startup(ref hash_map) => {
 			// try!(body.write(hash_map.as_cql_binary()));
 				try!(buf.write_u16::<BigEndian>(hash_map.len() as u16));

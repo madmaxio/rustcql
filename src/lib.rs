@@ -54,14 +54,14 @@ pub struct Client {
 impl Client {
   pub fn query(&mut self, query: String, consistency: Consistency) -> Result<Response> {
     let query = Request::Query(query, consistency);
-    try!(self.buf.write_message(&query));
+    try!(self.buf.write_message(query));
     try!(self.buf.flush());
 
     Ok(try!(self.buf.read_message()))
   }
   pub fn values_query(&mut self, query: String, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
     let query = Request::ValuesQuery(query, values, consistency);
-    try!(self.buf.write_message(&query));
+    try!(self.buf.write_message(query));
     try!(self.buf.flush());
 
     Ok(try!(self.buf.read_message()))
@@ -75,7 +75,7 @@ pub fn connect(addr: String) -> Result<Client> {
 
   let startup_msg = startup_request();
   let mut buf = BufStream::new(stream);
-  try!(buf.write_message(&startup_msg));
+  try!(buf.write_message(startup_msg));
   try!(buf.flush());
 
   let msg = try!(buf.read_message());
