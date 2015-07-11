@@ -59,8 +59,8 @@ impl Client {
 
     Ok(try!(self.buf.read_message()))
   }
-  pub fn values_query(&mut self, query: String, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
-    let query = Request::ValuesQuery(query, values, consistency);
+  pub fn prm_query(&mut self, query: String, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
+    let query = Request::PrmQuery(query, values, consistency);
     try!(self.buf.write_message(query));
     try!(self.buf.flush());
 

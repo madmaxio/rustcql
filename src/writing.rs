@@ -35,7 +35,6 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 
 	match message {
 			Request::Startup(ref hash_map) => {
-			// try!(body.write(hash_map.as_cql_binary()));
 				try!(buf.write_u16::<BigEndian>(hash_map.len() as u16));
 				for (key, val) in hash_map.iter() {
 					try!(buf.write_u16::<BigEndian>(key.len() as u16));
@@ -50,7 +49,7 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 				try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
 				try!(WriteBytesExt::write_u8(&mut buf, 0 as u8));
 			}
-			Request::ValuesQuery(ref query, ref values, ref consistency) => {
+			Request::PrmQuery(ref query, ref values, ref consistency) => {
 				try!(buf.write_i32::<BigEndian>(query.len() as i32));
 				try!(Write::write(&mut buf, query.as_bytes()));
 				try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
