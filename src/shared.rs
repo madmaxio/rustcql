@@ -4,6 +4,18 @@ use time::*;
 
 pub static CQL_BINARY_PROTOCOL_VERSION:u8 = 0x03;
 
+
+pub enum QueryFlag {
+	None = 0x00,
+	Values = 0x01,
+	SkipMetadata = 0x02,
+	PageSize = 0x04,
+	WithPagingState = 0x08,
+	WithSerialConsistency = 0x10,
+	WithDefaultTimestamp = 0x20,
+	WithNamesForValues = 0x40
+}
+
 #[derive(Clone, Copy)]
 pub enum Consistency {
   Any = 0x0000,
@@ -24,7 +36,8 @@ pub enum Consistency {
 pub enum Request {
   Startup(HashMap<String, String>),
   Options,
-  Query(String, Consistency)
+  Query(String, Consistency),
+  PrmQuery(String, Vec<Column>, Consistency)
 }
 
 impl Request {
@@ -32,7 +45,7 @@ impl Request {
     match *self {
       Request::Startup(_) => 0x01,
       Request::Options => 0x05,
-      Request::Query(_, _) => 0x07
+      Request::Query(_, _) | Request::PrmQuery(_, _, _)  => 0x07,
     }
   }
 }

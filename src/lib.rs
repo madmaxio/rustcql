@@ -7,19 +7,19 @@ extern crate uuid;
 pub mod shared;
 
 pub mod reading {
-	pub mod reader;
-	pub mod spec;
-	pub mod value;
+  pub mod reader;
+  pub mod spec;
+  pub mod value;
 }
 
 pub mod writing;
 
 use std::io::{
-	BufStream,
-	Result,
-	Error,
-	ErrorKind,
-	Write
+  BufStream,
+  Result,
+  Error,
+  ErrorKind,
+  Write
 };
 
 use std::net::TcpStream;
@@ -29,9 +29,10 @@ use std::convert::AsRef;
 use time::*;
 
 use shared::{
-	Request,
-    Consistency,
-    Response
+  Request,
+  Consistency,
+  Response,
+  Column
 };
 
 
@@ -53,7 +54,14 @@ pub struct Client {
 impl Client {
   pub fn query(&mut self, query: String, consistency: Consistency) -> Result<Response> {
     let query = Request::Query(query, consistency);
-    try!(self.buf.write_message(&query));
+    try!(self.buf.write_message(query));
+    try!(self.buf.flush());
+
+    Ok(try!(self.buf.read_message()))
+  }
+  pub fn prm_query(&mut self, query: String, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
+    let query = Request::PrmQuery(query, values, consistency);
+    try!(self.buf.write_message(query));
     try!(self.buf.flush());
 
     Ok(try!(self.buf.read_message()))
@@ -67,7 +75,7 @@ pub fn connect(addr: String) -> Result<Client> {
 
   let startup_msg = startup_request();
   let mut buf = BufStream::new(stream);
-  try!(buf.write_message(&startup_msg));
+  try!(buf.write_message(startup_msg));
   try!(buf.flush());
 
   let msg = try!(buf.read_message());
