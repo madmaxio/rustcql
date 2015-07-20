@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use time::*;
 
-pub static CQL_BINARY_PROTOCOL_VERSION:u8 = 0x03;
+pub static CQL_BINARY_PROTOCOL_VERSION:u8 = 0x04;
 
 
 pub enum QueryFlag {
