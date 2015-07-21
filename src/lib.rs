@@ -84,12 +84,12 @@ pub fn connect(addr: String) -> Result<Client> {
       println!("No auth required by server - moving on");
       let cli = Client { buf: buf };
       Ok(cli)
-    },
+    }
     Response::Authenticate(_) => {
       println!("Auth required - sending credentials - maybe");
       let cli = Client { buf: buf };
       Ok(cli)
-    },
+    }
     _ => {
       println!("Bad response - response was {:?}", msg);
       Err(Error::new(ErrorKind::ConnectionRefused, "Invalid response after startup"))
@@ -99,43 +99,6 @@ pub fn connect(addr: String) -> Result<Client> {
 
 pub fn now_str() -> String {
 	now_utc().rfc3339().to_string()
-}
-
-pub fn test1() {
-  let mut client = connect("10.0.2.15:9042".to_string()).unwrap();
-
-  let result = client.query("DROP KEYSPACE IF EXISTS testing".to_string(), Consistency::Quorum);
-  println!("Result of DROP KEYSPACE was {:?}", result);
-
-   let query = "CREATE KEYSPACE testing
-                WITH replication = {
-                 'class' : 'SimpleStrategy',
-                 'replication_factor' : 1
-               }".to_string();
-  let result = client.query(query, Consistency::Quorum);
-  println!("Result of CREATE KEYSPACE was {:?}", result);
-
-  let result = client.query("USE testing".to_string(), Consistency::Quorum);
-  println!("Result of USE was {:?}", result);
-
-  let query = "CREATE TABLE users (
-    user_id varchar PRIMARY KEY,
-    first varchar,
-    last varchar,
-    age int,
-    height float
-    )".to_string();
-
-  let result = client.query(query, Consistency::Quorum);
-  println!("Result of CREATE TABLE was {:?}", result);
-
-  let query = "INSERT INTO users (user_id, first, last, age, height)
-               VALUES ('jsmith', 'John', 'Smith', 42, 12.1);".to_string();
-  let result = client.query(query, Consistency::Quorum);
-  println!("Result of INSERT was {:?}", result);
-
-  let result = client.query("SELECT * FROM users".to_string(), Consistency::Quorum);
-  println!("Result of SELECT was {:?}", result);
 }
 
 #[test]
