@@ -153,3 +153,12 @@ pub enum Column {
 	List(Vec<Column>),
 	Map(Vec<(Column, Column)>)
 }
+
+impl Column {
+	pub fn get_str(&self) -> Option<String> {
+		match *self {
+			Column::CqlString(ref val) => Some(val.clone()),
+			_ => None
+		}
+	}
+}
