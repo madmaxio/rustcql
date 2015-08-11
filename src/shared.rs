@@ -161,4 +161,10 @@ impl Column {
 			_ => None
 		}
 	}
+	pub fn get_bigint(&self) -> Option<i64> {
+		match *self {
+				Column::CqlBigint(ref val) => Some(val.clone()),
+				_ => None
+			}
+	}
 }
