@@ -2,10 +2,7 @@ use time::*;
 
 use uuid::Uuid;
 
-use std::io::{
-	Read,
-	BufReader
-};
+use std::io::Read;
 
 use byteorder::{
 	BigEndian,
@@ -25,7 +22,7 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 	let len = buf.read_i32::<BigEndian>().unwrap();
 	println!("num of bytes for col {:?} is {}", data_type, len);
 
-	if (len < 0){
+	if len < 0 {
 		println!("read_column_value is returning without readind data (length was {})", len);
 		return Column::None
 	}
@@ -93,7 +90,7 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 			match collection_spec {
 				CollectionSpec::Map(map_key_column_type, map_value_column_type) => {
 					let mut map = vec!();
-					let mut key = Column::None;
+					let mut key: Column;
 					for i in 0..map_len {
 						key = read_collection_column_value(buf, map_key_column_type);
 						match key {
@@ -122,7 +119,7 @@ fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column
 	let len = buf.read_i32::<BigEndian>().unwrap();
 	println!("num of bytes for col {:?} is {}", data_type, len);
 
-	if (len < 0){
+	if len < 0 {
 		println!("read_column_value is returning without readind data (length was {})", len);
 		return Column::None
 	}

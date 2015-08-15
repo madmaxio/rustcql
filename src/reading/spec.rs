@@ -14,7 +14,7 @@ use shared::{
 
 use reading::reader::read_fixed;
 
-pub fn read_column_specs(buf: &mut Read, column_count: u32) -> Vec<ColumnSpec> {
+pub fn read_column_specs(buf: &mut Read, column_count: i32) -> Vec<ColumnSpec> {
 	let mut column_specs = vec!();
 	for _ in 0..column_count {
 		let len = buf.read_u16::<BigEndian>().unwrap();

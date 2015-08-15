@@ -1,5 +1,6 @@
-#![feature(core, convert, buf_stream)]
+#![feature(convert)]
 
+extern crate bufstream;
 extern crate time;
 extern crate byteorder;
 extern crate uuid;
@@ -14,8 +15,9 @@ pub mod reading {
 
 pub mod writing;
 
+use bufstream::BufStream;
+
 use std::io::{
-  BufStream,
   Result,
   Error,
   ErrorKind,
@@ -24,7 +26,6 @@ use std::io::{
 
 use std::net::TcpStream;
 use std::collections::HashMap;
-use std::convert::AsRef;
 
 use time::*;
 
@@ -53,18 +54,32 @@ pub struct Client {
 
 impl Client {
   pub fn query(&mut self, query: String, consistency: Consistency) -> Result<Response> {
-    let query = Request::Query(query, consistency);
-    try!(self.buf.write_message(query));
+    let message = Request::Query(query, consistency);
+    try!(self.buf.write_message(message));
     try!(self.buf.flush());
 
     Ok(try!(self.buf.read_message()))
   }
   pub fn prm_query(&mut self, query: String, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
-    let query = Request::PrmQuery(query, values, consistency);
-    try!(self.buf.write_message(query));
+    let message = Request::PrmQuery(query, values, consistency);
+    try!(self.buf.write_message(message));
     try!(self.buf.flush());
 
     Ok(try!(self.buf.read_message()))
+  }
+  pub fn prepare(&mut self, query: String) -> Result<Response> {
+	  let message = Request::Prepare(query);
+	  try!(self.buf.write_message(message));
+	  try!(self.buf.flush());
+
+	  Ok(try!(self.buf.read_message()))
+  }
+  pub fn execute(&mut self, id: Vec<u8>, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
+	  let message = Request::Execute(id, values, consistency);
+	  try!(self.buf.write_message(message));
+	  try!(self.buf.flush());
+
+	  Ok(try!(self.buf.read_message()))
   }
 }
 

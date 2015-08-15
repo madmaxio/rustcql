@@ -34,18 +34,22 @@ pub enum Consistency {
 
 
 pub enum Request {
-  Startup(HashMap<String, String>),
-  Options,
-  Query(String, Consistency),
-  PrmQuery(String, Vec<Column>, Consistency)
+	Startup(HashMap<String, String>),
+  	Options,
+  	Query(String, Consistency),
+  	PrmQuery(String, Vec<Column>, Consistency),
+ 	Prepare(String),
+	Execute(Vec<u8>, Vec<Column>, Consistency)
 }
 
 impl Request {
   pub fn opcode(&self) -> u8 {
     match *self {
-      Request::Startup(_) => 0x01,
-      Request::Options => 0x05,
-      Request::Query(_, _) | Request::PrmQuery(_, _, _)  => 0x07,
+      	Request::Startup(_) => 0x01,
+      	Request::Options => 0x05,
+      	Request::Query(_, _) | Request::PrmQuery(_, _, _)  => 0x07,
+		Request::Prepare(_) => 0x09,
+		Request::Execute(_, _, _) => 0x0A
     }
   }
 }
@@ -66,7 +70,7 @@ pub enum ResultBody {
   Void,
   Rows(Vec<Row>),
   SetKeyspace(String),
-  Prepared,
+  Prepared(Vec<u8>),
   SchemaChange(String, String, String)
 }
 

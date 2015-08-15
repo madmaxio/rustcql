@@ -90,8 +90,8 @@ fn read_result(buf: &mut Read) -> Result<Response> {
 
 	let body = match result_type {
 			2 => {
-			let flags = try!(buf.read_u32::<BigEndian>());
-			let column_count = try!(buf.read_u32::<BigEndian>());
+			let flags = try!(buf.read_i32::<BigEndian>());
+			let columns_count = try!(buf.read_i32::<BigEndian>());
 			//assume global column spec
 			let len = try!(buf.read_u16::<BigEndian>());
 			let bytes = read_fixed(buf, len as usize);
@@ -101,11 +101,11 @@ fn read_result(buf: &mut Read) -> Result<Response> {
 			let string_bytes = read_fixed(buf, len as usize);
 			let table = String::from_utf8(string_bytes).unwrap();
 
-			println!("The flags are {}, and column count is {}", flags, column_count);
+			println!("The flags are {}, and column count is {}", flags, columns_count);
 			println!("The keyspace is {}, and table is {}", keyspace, table);
 
-			let column_specs = read_column_specs(buf, column_count);
-			let row_count = try!(buf.read_u32::<BigEndian>());				
+			let column_specs = read_column_specs(buf, columns_count);
+			let row_count = try!(buf.read_i32::<BigEndian>());
 			let mut rows = vec!();
 			println!("Row count: {}", row_count);
 
@@ -119,14 +119,43 @@ fn read_result(buf: &mut Read) -> Result<Response> {
 				rows.push(Row { columns: columns});				
 			}
 			ResultBody::Rows(rows)
-		},
+			}
 			3 => {
-			let len = try!(buf.read_u16::<BigEndian>());
-			let string_bytes = read_fixed(buf, len as usize);
-			let name = String::from_utf8(string_bytes).unwrap();
-			ResultBody::SetKeyspace(name)
-		},
-			4 => ResultBody::Prepared,
+				let len = try!(buf.read_u16::<BigEndian>());
+				let string_bytes = read_fixed(buf, len as usize);
+				let name = String::from_utf8(string_bytes).unwrap();
+				ResultBody::SetKeyspace(name)
+			}
+			4 => {
+				let len = try!(buf.read_u16::<BigEndian>());
+				let id = read_fixed(buf, len as usize);
+				let flags = try!(buf.read_i32::<BigEndian>());
+				println!("flags is {}", flags);
+				let columns_count = try!(buf.read_i32::<BigEndian>());
+				println!("columns_count is {}", columns_count);
+				let pk_count = try!(buf.read_i32::<BigEndian>());
+				println!("pk_count is {}", pk_count);
+
+				for _ in 0..pk_count {
+					let pk_index = try!(buf.read_u16::<BigEndian>());
+				}
+
+				//assume global column spec
+
+				let len = try!(buf.read_u16::<BigEndian>());
+				let bytes = read_fixed(buf, len as usize);
+				let keyspace = String::from_utf8(bytes).unwrap();
+
+				let len = try!(buf.read_u16::<BigEndian>());
+				let string_bytes = read_fixed(buf, len as usize);
+				let table = String::from_utf8(string_bytes).unwrap();
+
+				println!("The flags are {}, and column count is {}", flags, columns_count);
+				println!("The keyspace is {}, and table is {}", keyspace, table);
+
+				let column_specs = read_column_specs(buf, columns_count);
+				ResultBody::Prepared(id)
+			}
 			5 => {
 			// dedup this - map over range?
 			let len = try!(buf.read_u16::<BigEndian>());
@@ -141,7 +170,7 @@ fn read_result(buf: &mut Read) -> Result<Response> {
 			let string_bytes = read_fixed(buf, len as usize);
 			let table = String::from_utf8(string_bytes).unwrap();
 			ResultBody::SchemaChange(change, keyspace, table)
-		},
+		}
 			_ => ResultBody::Void,
 		};
 

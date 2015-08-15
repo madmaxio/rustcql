@@ -9,14 +9,9 @@ keywords = ["cassandra", "cql", "database", "driver"]
 
 
 
-[dependencies.time]
+[dependencies]
 
-git = "https://github.com/rust-lang/time"
-
-[dependencies.uuid]
-
-git = "https://github.com/rust-lang/uuid"
-
-[dependencies.byteorder]
-
-git = "https://github.com/BurntSushi/byteorder"
+bufstream = "*"
+byteorder = "*"
+time = "*"
+uuid = "*"
