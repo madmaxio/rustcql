@@ -33,6 +33,7 @@ use shared::{
   Request,
   Consistency,
   Response,
+  BatchQuery,
   Column
 };
 
@@ -48,11 +49,11 @@ fn startup_request() -> Request {
   Request::Startup(body)
 }
 
-pub struct Client {
+pub struct Connection {
   buf: BufStream<TcpStream>
 }
 
-impl Client {
+impl Connection {
   pub fn query(&mut self, query: String, consistency: Consistency) -> Result<Response> {
     let message = Request::Query(query, consistency);
     try!(self.buf.write_message(message));
@@ -81,10 +82,17 @@ impl Client {
 
 	  Ok(try!(self.buf.read_message()))
   }
+  pub fn batch(&mut self, queries: Vec<BatchQuery>, consistency: Consistency) -> Result<Response> {
+    let message = Request::Batch(queries, consistency);
+    try!(self.buf.write_message(message));
+    try!(self.buf.flush());
+
+    Ok(try!(self.buf.read_message()))
+  }
 }
 
 
-pub fn connect(addr: String) -> Result<Client> {
+pub fn connect(addr: String) -> Result<Connection> {
 
   let stream = try!(TcpStream::connect(&*addr));
 
@@ -97,12 +105,12 @@ pub fn connect(addr: String) -> Result<Client> {
   match msg {
     Response::Ready => {
       println!("No auth required by server - moving on");
-      let cli = Client { buf: buf };
+      let cli = Connection { buf: buf };
       Ok(cli)
     }
     Response::Authenticate(_) => {
       println!("Auth required - sending credentials - maybe");
-      let cli = Client { buf: buf };
+      let cli = Connection { buf: buf };
       Ok(cli)
     }
     _ => {
@@ -118,9 +126,9 @@ pub fn now_str() -> String {
 
 #[test]
 fn connect_and_query() {
-  let mut client = connect("127.0.0.1:9042".to_string()).unwrap();
+  let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
 
-  let result = client.query("DROP KEYSPACE IF EXISTS testing".to_string(), Consistency::Quorum);
+  let result = conn.query("DROP KEYSPACE IF EXISTS testing".to_string(), Consistency::Quorum);
   println!("Result of DROP KEYSPACE was {:?}", result);
 
   let query = "CREATE KEYSPACE testing
@@ -128,10 +136,10 @@ fn connect_and_query() {
                  'class' : 'SimpleStrategy',
                  'replication_factor' : 1
                }".to_string();
-  let result = client.query(query, Consistency::Quorum);
+  let result = conn.query(query, Consistency::Quorum);
   println!("Result of CREATE KEYSPACE was {:?}", result);
 
-  let result = client.query("USE testing".to_string(), Consistency::Quorum);
+  let result = conn.query("USE testing".to_string(), Consistency::Quorum);
   println!("Result of USE was {:?}", result);
 
   let query = "CREATE TABLE users (
@@ -142,14 +150,14 @@ fn connect_and_query() {
     height float
     )".to_string();
 
-  let result = client.query(query, Consistency::Quorum);
+  let result = conn.query(query, Consistency::Quorum);
   println!("Result of CREATE TABLE was {:?}", result);
 
   let query = "INSERT INTO users (user_id, first, last, age, height)
                VALUES ('jsmith', 'John', 'Smith', 42, 12.1);".to_string();
-  let result = client.query(query, Consistency::Quorum);
+  let result = conn.query(query, Consistency::Quorum);
   println!("Result of INSERT was {:?}", result);
 
-  let result = client.query("SELECT * FROM users".to_string(), Consistency::Quorum);
+  let result = conn.query("SELECT * FROM users".to_string(), Consistency::Quorum);
   println!("Result of SELECT was {:?}", result);
 }

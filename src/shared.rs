@@ -18,20 +18,43 @@ pub enum QueryFlag {
 
 #[derive(Clone, Copy)]
 pub enum Consistency {
-  Any = 0x0000,
-  One = 0x0001,
-  Two = 0x0002,
-  Three = 0x0003,
-  Quorum = 0x0004,
-  All = 0x0005,
-  LocalQuorum = 0x0006,
-  EachQuorum = 0x0007,
-  Serial = 0x0008,
-  LocalSerial = 0x0009,
-  LocalOne = 0x000A,
-  Unknown
+	Any = 0x0000,
+	One = 0x0001,
+	Two = 0x0002,
+	Three = 0x0003,
+	Quorum = 0x0004,
+	All = 0x0005,
+	LocalQuorum = 0x0006,
+	EachQuorum = 0x0007,
+	Serial = 0x0008,
+	LocalSerial = 0x0009,
+	LocalOne = 0x000A,
+	Unknown
 }
 
+pub enum BatchType {
+	Logged = 0x00,
+	Unlogged = 0x01,
+	Counter = 0x02
+}
+
+pub enum BatchFlag {
+	None = 0x00,
+	WithSerialConsistency = 0x10,
+	WithDefaultTimestamp = 0x20,
+	WithNamesForValues = 0x40
+}
+
+pub enum BatchQueryKind {
+	Simple = 0x00,
+	Prepared = 0x01
+}
+
+pub enum BatchQuery {
+	Simple(String),
+	SimpleWithParams(String, Vec<Column>),
+	Prepared(Vec<u8>, Vec<Column>)
+}
 
 pub enum Request {
 	Startup(HashMap<String, String>),
@@ -39,7 +62,8 @@ pub enum Request {
   	Query(String, Consistency),
   	PrmQuery(String, Vec<Column>, Consistency),
  	Prepare(String),
-	Execute(Vec<u8>, Vec<Column>, Consistency)
+	Execute(Vec<u8>, Vec<Column>, Consistency),
+	Batch(Vec<BatchQuery>, Consistency)
 }
 
 impl Request {
@@ -49,7 +73,8 @@ impl Request {
       	Request::Options => 0x05,
       	Request::Query(_, _) | Request::PrmQuery(_, _, _)  => 0x07,
 		Request::Prepare(_) => 0x09,
-		Request::Execute(_, _, _) => 0x0A
+		Request::Execute(_, _, _) => 0x0A,
+		Request::Batch(_, _) => 0x0D
     }
   }
 }
