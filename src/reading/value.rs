@@ -42,7 +42,7 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 			Column::CqlString(uuid.to_hyphenated_string())
 		}
 		ColumnType::Timestamp =>
-			Column::CqlTimestamp(get_tm(buf.read_i64::<BigEndian>().unwrap())),
+			Column::CqlTimestamp(get_dt(buf.read_i64::<BigEndian>().unwrap())),
 
 		ColumnType::Set => {
 
@@ -133,7 +133,7 @@ fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column
 			Column::CqlString(Uuid::from_bytes(bytes.as_slice()).unwrap().to_hyphenated_string())
 		}
 		ColumnType::Timestamp =>
-			Column::CqlTimestamp(get_tm(buf.read_i64::<BigEndian>().unwrap())),
+			Column::CqlTimestamp(get_dt(buf.read_i64::<BigEndian>().unwrap())),
 		_ => {
 			let bytes = read_fixed(buf, len as usize);
 			Column::CqlString(String::from_utf8(bytes).unwrap())
@@ -142,7 +142,7 @@ fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column
 
 }
 
-fn get_tm(ts: i64) -> DateTime<UTC> {
+fn get_dt(ts: i64) -> DateTime<UTC> {
 	let s = (ts / 1000) as i64;
 	let ns = (ts % 1000) as u32;
 	let naive = NaiveDateTime::from_timestamp(s, ns);
