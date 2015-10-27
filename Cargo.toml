@@ -13,5 +13,5 @@ keywords = ["cassandra", "cql", "database", "driver"]
 
 bufstream = "*"
 byteorder = "*"
-time = "*"
+chrono = "*"
 uuid = "*"

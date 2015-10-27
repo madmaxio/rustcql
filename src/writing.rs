@@ -148,13 +148,12 @@ fn write_values(buf: &mut Vec<u8>, values: &Vec<Column>) -> Result<()> {
 				try!(buf.write_i32::<BigEndian>(size_of::<f64>() as i32));
 				try!(buf.write_f64::<BigEndian>(*v));
 			}
-			&Column::CqlTimestamp(ref v) => { //Tm
-				let s = (*v).rfc3339().to_string();
-				try!(buf.write_i32::<BigEndian>(s.len() as i32));
-				try!(Write::write(buf, s.as_bytes()));
+			&Column::CqlTimestamp(ref v) => { // DateTime
+				try!(buf.write_i32::<BigEndian>(size_of::<i64>() as i32));
+				try!(buf.write_i64::<BigEndian>((*v).timestamp() * 1000));
 			}
-				_ => {}
-			}
+			_ => {}
+		}
 	}
 	Ok(())
 }

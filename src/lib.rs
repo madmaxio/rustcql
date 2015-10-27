@@ -1,7 +1,7 @@
 #![feature(convert)]
 
 extern crate bufstream;
-extern crate time;
+extern crate chrono;
 extern crate byteorder;
 extern crate uuid;
 
@@ -15,8 +15,6 @@ pub mod reading {
 
 pub mod writing;
 
-use bufstream::BufStream;
-
 use std::io::{
   Result,
   Error,
@@ -27,7 +25,7 @@ use std::io::{
 use std::net::TcpStream;
 use std::collections::HashMap;
 
-use time::*;
+use bufstream::BufStream;
 
 use shared::{
   Request,
@@ -118,10 +116,6 @@ pub fn connect(addr: String) -> Result<Connection> {
       Err(Error::new(ErrorKind::ConnectionRefused, "Invalid response after startup"))
     }
   }
-}
-
-pub fn now_str() -> String {
-	now_utc().rfc3339().to_string()
 }
 
 #[test]

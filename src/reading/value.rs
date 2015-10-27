@@ -1,8 +1,8 @@
-use time::*;
+use std::io::Read;
+
+use chrono::*;
 
 use uuid::Uuid;
-
-use std::io::Read;
 
 use byteorder::{
 	BigEndian,
@@ -142,9 +142,9 @@ fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column
 
 }
 
-fn get_tm(ts: i64) -> Tm {
+fn get_tm(ts: i64) -> DateTime<UTC> {
 	let s = (ts / 1000) as i64;
-	let ns = (ts % 1000) as i32;
-	let tsp = Timespec::new(s, ns);
-	at_utc(tsp)
+	let ns = (ts % 1000) as u32;
+	let naive = NaiveDateTime::from_timestamp(s, ns);
+	DateTime::from_utc(naive, UTC)
 }
