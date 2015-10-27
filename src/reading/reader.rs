@@ -101,20 +101,20 @@ fn read_result(buf: &mut Read) -> Result<Response> {
 			let string_bytes = read_fixed(buf, len as usize);
 			let table = String::from_utf8(string_bytes).unwrap();
 
-			println!("The flags are {}, and column count is {}", flags, columns_count);
-			println!("The keyspace is {}, and table is {}", keyspace, table);
+			//println!("The flags are {}, and column count is {}", flags, columns_count);
+			//println!("The keyspace is {}, and table is {}", keyspace, table);
 
 			let column_specs = read_column_specs(buf, columns_count);
 			let row_count = try!(buf.read_i32::<BigEndian>());
 			let mut rows = vec!();
-			println!("Row count: {}", row_count);
+			//println!("Row count: {}", row_count);
 
 			for _ in 0..row_count {
 				let mut columns = HashMap::new();
 				for col_spec in column_specs.iter() {					
-					println!("started column {:?}", col_spec);
+					//println!("started column {:?}", col_spec);
 					columns.insert(col_spec.name.clone(), read_column_value(buf, col_spec.data_type, col_spec.collection_spec.clone()));
-					println!("finished column");
+					//println!("finished column");
 				}				
 				rows.push(Row { columns: columns});				
 			}
@@ -130,11 +130,11 @@ fn read_result(buf: &mut Read) -> Result<Response> {
 				let len = try!(buf.read_u16::<BigEndian>());
 				let id = read_fixed(buf, len as usize);
 				let flags = try!(buf.read_i32::<BigEndian>());
-				println!("flags is {}", flags);
+				//println!("flags is {}", flags);
 				let columns_count = try!(buf.read_i32::<BigEndian>());
-				println!("columns_count is {}", columns_count);
+				//println!("columns_count is {}", columns_count);
 				let pk_count = try!(buf.read_i32::<BigEndian>());
-				println!("pk_count is {}", pk_count);
+				//println!("pk_count is {}", pk_count);
 
 				for _ in 0..pk_count {
 					let pk_index = try!(buf.read_u16::<BigEndian>());
@@ -150,8 +150,8 @@ fn read_result(buf: &mut Read) -> Result<Response> {
 				let string_bytes = read_fixed(buf, len as usize);
 				let table = String::from_utf8(string_bytes).unwrap();
 
-				println!("The flags are {}, and column count is {}", flags, columns_count);
-				println!("The keyspace is {}, and table is {}", keyspace, table);
+				//println!("The flags are {}, and column count is {}", flags, columns_count);
+				//println!("The keyspace is {}, and table is {}", keyspace, table);
 
 				let column_specs = read_column_specs(buf, columns_count);
 				ResultBody::Prepared(id)

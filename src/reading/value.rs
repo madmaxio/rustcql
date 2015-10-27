@@ -20,10 +20,10 @@ use reading::reader::read_fixed;
 pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec: CollectionSpec) -> Column {
 
 	let len = buf.read_i32::<BigEndian>().unwrap();
-	println!("num of bytes for col {:?} is {}", data_type, len);
+	//println!("num of bytes for col {:?} is {}", data_type, len);
 
 	if len < 0 {
-		println!("read_column_value is returning without readind data (length was {})", len);
+		//println!("read_column_value is returning without readind data (length was {})", len);
 		return Column::None
 	}
 
@@ -47,14 +47,14 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 		ColumnType::Set => {
 
 			let set_len = buf.read_i32::<BigEndian>().unwrap();
-			println!("set len is {}", set_len);
+			//println!("set len is {}", set_len);
 
 			match collection_spec {
 				CollectionSpec::Set(set_column_type) => {
 					let mut set = vec!();
 					for i in 0..set_len {
 						set.push(read_collection_column_value(buf, set_column_type));
-						println!("iterating over set, counter is {}", i);
+						//println!("iterating over set, counter is {}", i);
 					}
 					Column::Set(set)
 				}
@@ -66,14 +66,14 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 		ColumnType::List => {
 
 			let list_len = buf.read_i32::<BigEndian>().unwrap();
-			println!("list len is {}", list_len);
+			//println!("list len is {}", list_len);
 
 			match collection_spec {
 				CollectionSpec::List(list_column_type) => {
 					let mut list = vec!();
 						for i in 0..list_len {
 							list.push(read_collection_column_value(buf, list_column_type));
-							println!("iterating over list, counter is {}", i);
+							//println!("iterating over list, counter is {}", i);
 						}
 					Column::List(list)
 				},
@@ -85,7 +85,7 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 		ColumnType::Map => {
 
 			let map_len = buf.read_i32::<BigEndian>().unwrap();
-			println!("map len is {}", map_len);
+			//println!("map len is {}", map_len);
 
 			match collection_spec {
 				CollectionSpec::Map(map_key_column_type, map_value_column_type) => {
@@ -97,7 +97,7 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 							Column::None => {},
 							_ => map.push((key.clone(), read_collection_column_value(buf, map_value_column_type)))
 						}
-						println!("iterating over map, counter is {}", i);
+						//println!("iterating over map, counter is {}", i);
 					}
 					Column::Map(map)
 				}
@@ -117,10 +117,10 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column {
 
 	let len = buf.read_i32::<BigEndian>().unwrap();
-	println!("num of bytes for col {:?} is {}", data_type, len);
+	//println!("num of bytes for col {:?} is {}", data_type, len);
 
 	if len < 0 {
-		println!("read_column_value is returning without readind data (length was {})", len);
+		//println!("read_column_value is returning without readind data (length was {})", len);
 		return Column::None
 	}
 

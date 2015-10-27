@@ -37,7 +37,7 @@ fn match3(buf: &mut Read, column_name: String, column_specs: &mut Vec<ColumnSpec
 			match2(buf, column_type, &mut spec),
 		_ => {}
 	};
-	println!("Dat spec: {:?}", spec);
+	//println!("Dat spec: {:?}", spec);
 	column_specs.push(spec);
 }
 
