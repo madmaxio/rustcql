@@ -30,7 +30,7 @@ fn read_message(&mut self) -> Result<Response> {
 	let mut buf = BufReader::new(self);
 	let _version = try!(buf.read_u8());
 	let _flags = try!(buf.read_u8());
-	let _stream = try!(buf.read_i16::<BigEndian>());
+	let _stream = try!(buf.read_u16::<BigEndian>());
 	let opcode = try!(buf.read_u8());
 	try!(buf.read_u32::<BigEndian>()); // length
 
