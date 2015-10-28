@@ -29,7 +29,7 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 
 	try!(WriteBytesExt::write_u8(&mut header, CQL_BINARY_PROTOCOL_VERSION));
 	try!(WriteBytesExt::write_u8(&mut header, 0x00));
-	try!(WriteBytesExt::write_i16::<BigEndian>(&mut header, 1));
+	try!(WriteBytesExt::write_u16::<BigEndian>(&mut header, 1));
 	try!(WriteBytesExt::write_u8(&mut header, message.opcode()));
 
 
