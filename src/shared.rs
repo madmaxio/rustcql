@@ -140,7 +140,9 @@ pub enum ColumnType {
 	Inet = 0x0010,
 	List = 0x0020,
 	Map = 0x0021,
-	Set = 0x0022
+	Set = 0x0022,
+    UDT = 0x0030,
+	Tuple = 0x0031
 }
 
 pub fn to_column_type(value: u16) -> ColumnType {
@@ -164,7 +166,9 @@ pub fn to_column_type(value: u16) -> ColumnType {
 		0x0010 => ColumnType::Inet,
 		0x0020 => ColumnType::List,
 		0x0021 => ColumnType::Map,
-		0x0022 => ColumnType::Set, 
+		0x0022 => ColumnType::Set,
+		0x0030 => ColumnType::UDT,
+		0x0031 => ColumnType::Tuple,
 		_ => ColumnType::Varchar
 	}
 }
