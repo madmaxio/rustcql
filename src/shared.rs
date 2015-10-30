@@ -176,27 +176,33 @@ pub fn to_column_type(value: u16) -> ColumnType {
 #[derive(Debug, Clone)]
 pub enum Column {
 	None,
-	CqlString(String),
-	CqlInt(i32),
-	CqlBigint(i64),
-	CqlFloat(f32),
-	CqlDouble(f64),
-	CqlTimestamp(DateTime<UTC>),
+	String(String),
+	Int(i32),
+	Bigint(i64),
+	Float(f32),
+	Double(f64),
+	Timestamp(DateTime<UTC>),
 	Set(Vec<Column>),
 	List(Vec<Column>),
 	Map(Vec<(Column, Column)>)
 }
 
 impl Column {
-	pub fn get_str(&self) -> Option<String> {
+	pub fn get_string(&self) -> Option<String> {
 		match *self {
-			Column::CqlString(ref val) => Some(val.clone()),
+			Column::String(ref val) => Some(val.clone()),
 			_ => None
 		}
 	}
 	pub fn get_bigint(&self) -> Option<i64> {
 		match *self {
-				Column::CqlBigint(ref val) => Some(val.clone()),
+				Column::Bigint(ref val) => Some(val.clone()),
+				_ => None
+			}
+	}
+	pub fn get_datetime(&self) -> Option<DateTime<UTC>> {
+		match *self {
+				Column::Timestamp(ref val) => Some(val.clone()),
 				_ => None
 			}
 	}

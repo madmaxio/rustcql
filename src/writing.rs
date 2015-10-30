@@ -135,12 +135,12 @@ fn write_values(buf: &mut Vec<u8>, values: &Vec<Column>) -> Result<()> {
 
 fn value_size(value: &Column) -> usize {
 	match value {
-		&Column::CqlString(ref v) => v.len(),
-		&Column::CqlInt(ref v) => size_of::<i32>(),
-		&Column::CqlBigint(ref v) => size_of::<i64>(),
-		&Column::CqlFloat(ref v) => size_of::<f32>(),
-		&Column::CqlDouble(ref v) => size_of::<f64>(),
-		&Column::CqlTimestamp(ref v) => size_of::<i64>(),
+		&Column::String(ref v) => v.len(),
+		&Column::Int(ref v) => size_of::<i32>(),
+		&Column::Bigint(ref v) => size_of::<i64>(),
+		&Column::Float(ref v) => size_of::<f32>(),
+		&Column::Double(ref v) => size_of::<f64>(),
+		&Column::Timestamp(ref v) => size_of::<i64>(),
 		&Column::Set(ref v) | &Column::List(ref v) => size_of::<i32>() + ((*v).len()) * (value_size(&(*v)[0]) + size_of::<i32>()),
 		_ => 0
 	}
@@ -148,12 +148,12 @@ fn value_size(value: &Column) -> usize {
 
 fn write_value(buf: &mut Vec<u8>, value: &Column) -> Result<()> {
 	match value {
-		&Column::CqlString(ref v) => {try!(Write::write(buf, v.as_bytes()));}
-		&Column::CqlInt(ref v) => {try!(buf.write_i32::<BigEndian>(*v));}
-		&Column::CqlBigint(ref v) => {try!(buf.write_i64::<BigEndian>(*v));}
-		&Column::CqlFloat(ref v) => {try!(buf.write_f32::<BigEndian>(*v));}
-		&Column::CqlDouble(ref v) => {try!(buf.write_f64::<BigEndian>(*v));}
-		&Column::CqlTimestamp(ref v) => {try!(buf.write_i64::<BigEndian>((*v).timestamp() * 1000));}
+		&Column::String(ref v) => {try!(Write::write(buf, v.as_bytes()));}
+		&Column::Int(ref v) => {try!(buf.write_i32::<BigEndian>(*v));}
+		&Column::Bigint(ref v) => {try!(buf.write_i64::<BigEndian>(*v));}
+		&Column::Float(ref v) => {try!(buf.write_f32::<BigEndian>(*v));}
+		&Column::Double(ref v) => {try!(buf.write_f64::<BigEndian>(*v));}
+		&Column::Timestamp(ref v) => {try!(buf.write_i64::<BigEndian>((*v).timestamp() * 1000));}
 		&Column::Set(ref v) | &Column::List(ref v) => {
 			try!(buf.write_i32::<BigEndian>((*v).len() as i32));
 			for value in (*v).iter() {

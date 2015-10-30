@@ -29,20 +29,20 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 
 	match data_type {
 		ColumnType::Float =>
-			Column::CqlFloat(buf.read_f32::<BigEndian>().unwrap()),
+			Column::Float(buf.read_f32::<BigEndian>().unwrap()),
 		ColumnType::Double =>
-			Column::CqlDouble(buf.read_f64::<BigEndian>().unwrap()),
+			Column::Double(buf.read_f64::<BigEndian>().unwrap()),
 		ColumnType::Int =>
-			Column::CqlInt(buf.read_i32::<BigEndian>().unwrap()),
+			Column::Int(buf.read_i32::<BigEndian>().unwrap()),
 		ColumnType::Bigint =>
-			Column::CqlBigint(buf.read_i64::<BigEndian>().unwrap()),
+			Column::Bigint(buf.read_i64::<BigEndian>().unwrap()),
 		ColumnType::Timeuuid => {
 			let bytes = read_fixed(buf, len as usize);
 			let uuid = Uuid::from_bytes(bytes.as_slice()).unwrap();
-			Column::CqlString(uuid.to_hyphenated_string())
+			Column::String(uuid.to_hyphenated_string())
 		}
 		ColumnType::Timestamp =>
-			Column::CqlTimestamp(get_dt(buf.read_i64::<BigEndian>().unwrap())),
+			Column::Timestamp(get_dt(buf.read_i64::<BigEndian>().unwrap())),
 
 		ColumnType::Set => {
 
@@ -109,7 +109,7 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 
 		_ => {
 			let bytes = read_fixed(buf, len as usize);
-			Column::CqlString(String::from_utf8(bytes).unwrap())
+			Column::String(String::from_utf8(bytes).unwrap())
 		}
 	}
 }
@@ -125,18 +125,18 @@ fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column
 	}
 
 	match data_type {
-		ColumnType::Float => Column::CqlFloat(buf.read_f32::<BigEndian>().unwrap()),
-		ColumnType::Double => Column::CqlDouble(buf.read_f64::<BigEndian>().unwrap()),
-		ColumnType::Int => Column::CqlInt(buf.read_i32::<BigEndian>().unwrap()),
+		ColumnType::Float => Column::Float(buf.read_f32::<BigEndian>().unwrap()),
+		ColumnType::Double => Column::Double(buf.read_f64::<BigEndian>().unwrap()),
+		ColumnType::Int => Column::Int(buf.read_i32::<BigEndian>().unwrap()),
 		ColumnType::Timeuuid => {
 			let bytes = read_fixed(buf, len as usize);
-			Column::CqlString(Uuid::from_bytes(bytes.as_slice()).unwrap().to_hyphenated_string())
+			Column::String(Uuid::from_bytes(bytes.as_slice()).unwrap().to_hyphenated_string())
 		}
 		ColumnType::Timestamp =>
-			Column::CqlTimestamp(get_dt(buf.read_i64::<BigEndian>().unwrap())),
+			Column::Timestamp(get_dt(buf.read_i64::<BigEndian>().unwrap())),
 		_ => {
 			let bytes = read_fixed(buf, len as usize);
-			Column::CqlString(String::from_utf8(bytes).unwrap())
+			Column::String(String::from_utf8(bytes).unwrap())
 		}
 	}
 
