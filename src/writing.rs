@@ -52,6 +52,7 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 				try!(WriteBytesExt::write_u8(&mut buf, 0 as u8));
 			}
 			Request::PrmQuery(ref query, ref values, ref consistency) => {
+				//println!("query is {}", query);
 				try!(buf.write_i32::<BigEndian>(query.len() as i32));
 				try!(Write::write(&mut buf, query.as_bytes()));
 				try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));

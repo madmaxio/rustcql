@@ -56,6 +56,7 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 						set.push(read_collection_column_value(buf, set_column_type));
 						//println!("iterating over set, counter is {}", i);
 					}
+					//println!("set finished");
 					Column::Set(set)
 				}
 				_ => Column::None
@@ -128,6 +129,7 @@ fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column
 		ColumnType::Float => Column::Float(buf.read_f32::<BigEndian>().unwrap()),
 		ColumnType::Double => Column::Double(buf.read_f64::<BigEndian>().unwrap()),
 		ColumnType::Int => Column::Int(buf.read_i32::<BigEndian>().unwrap()),
+		ColumnType::Bigint => Column::Bigint(buf.read_i64::<BigEndian>().unwrap()),
 		ColumnType::Timeuuid => {
 			let bytes = read_fixed(buf, len as usize);
 			Column::String(Uuid::from_bytes(bytes.as_slice()).unwrap().to_hyphenated_string())

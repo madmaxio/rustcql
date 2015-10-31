@@ -196,14 +196,25 @@ impl Column {
 	}
 	pub fn get_bigint(&self) -> Option<i64> {
 		match *self {
-				Column::Bigint(ref val) => Some(val.clone()),
+				Column::Bigint(ref val) => Some(*val),
 				_ => None
 			}
 	}
 	pub fn get_datetime(&self) -> Option<DateTime<UTC>> {
 		match *self {
-				Column::Timestamp(ref val) => Some(val.clone()),
+				Column::Timestamp(ref val) => Some(*val),
 				_ => None
 			}
+	}
+	pub fn get_vec(&self) -> Option<Vec<Column>> {
+		match *self {
+			Column::Set(ref val) | Column::List(ref val) => {
+				if val.len() == 0 {
+					return None;
+				}
+				Some(val.clone())
+			}
+			_ => None
+		}
 	}
 }
