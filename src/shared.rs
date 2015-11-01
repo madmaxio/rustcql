@@ -194,9 +194,27 @@ impl Column {
 			_ => None
 		}
 	}
+	pub fn get_int(&self) -> Option<i32> {
+		match *self {
+				Column::Int(ref val) => Some(*val),
+				_ => None
+			}
+	}
 	pub fn get_bigint(&self) -> Option<i64> {
 		match *self {
 				Column::Bigint(ref val) => Some(*val),
+				_ => None
+			}
+	}
+	pub fn get_float(&self) -> Option<f32> {
+		match *self {
+				Column::Float(ref val) => Some(*val),
+				_ => None
+			}
+	}
+	pub fn get_double(&self) -> Option<f64> {
+		match *self {
+				Column::Double(ref val) => Some(*val),
 				_ => None
 			}
 	}
