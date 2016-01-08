@@ -1,5 +1,6 @@
 #![feature(convert)]
 
+extern crate core;
 extern crate bufstream;
 extern crate chrono;
 extern crate byteorder;

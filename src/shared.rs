@@ -1,4 +1,7 @@
 use std::collections::HashMap;
+use core::cmp::PartialEq;
+
+
 
 use chrono::*;
 
@@ -173,7 +176,7 @@ pub fn to_column_type(value: u16) -> ColumnType {
 	}
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Column {
 	None,
 	String(String),
