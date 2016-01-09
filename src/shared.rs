@@ -53,6 +53,7 @@ pub enum BatchQueryKind {
 	Prepared = 0x01
 }
 
+#[derive(Debug)]
 pub enum BatchQuery {
 	Simple(String),
 	SimpleWithParams(String, Vec<Column>),
