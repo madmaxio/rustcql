@@ -146,7 +146,6 @@ fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column
 
 fn get_dt(ts: i64) -> DateTime<UTC> {
 	let s = (ts / 1000) as i64;
-	let ns = (ts % 1000) as u32;
-	let naive = NaiveDateTime::from_timestamp(s, ns);
+	let naive = NaiveDateTime::from_timestamp(s, 0);
 	DateTime::from_utc(naive, UTC)
 }
