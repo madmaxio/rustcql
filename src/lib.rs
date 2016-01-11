@@ -81,7 +81,7 @@ impl Connection {
 
 	  Ok(try!(self.buf.read_message()))
   }
-  pub fn batch(&mut self, queries: Vec<BatchQuery>, consistency: Consistency) -> Result<Response> {
+  pub fn execute_batch(&mut self, queries: Vec<BatchQuery>, consistency: Consistency) -> Result<Response> {
     let message = Request::Batch(queries, consistency);
     try!(self.buf.write_message(message));
     try!(self.buf.flush());
