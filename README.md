@@ -5,3 +5,5 @@
 
 Based on [cql-rust](https://github.com/iterion/cql-rust)
 
+License is MIT.
+

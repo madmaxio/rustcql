@@ -4,9 +4,10 @@ name = "rustcql"
 version = "0.0.1"
 authors = ["Maxim Baranov <sprayrules@gmail.com>"]
 
-
+description = "Rust Cassandra Client (CQL BINARY PROTOCOL v4)"
+repository = "https://github.com/madmaxio/rustcql"
 keywords = ["cassandra", "cql", "database", "driver"]
-
+license = "MIT"
 
 
 [dependencies]
