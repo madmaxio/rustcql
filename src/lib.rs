@@ -43,7 +43,7 @@ use writing::WriteMessage;
 
 fn startup_request() -> Request {
   let mut body = HashMap::new();
-  body.insert("CQL_VERSION".to_string(), "3.2.0".to_string());
+  body.insert("CQL_VERSION".to_string(), "3.4.0".to_string());
 
   Request::Startup(body)
 }
