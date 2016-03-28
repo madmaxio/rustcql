@@ -65,6 +65,7 @@ pub enum Request {
   	Options,
   	Query(String, Consistency),
   	PrmQuery(String, Vec<Column>, Consistency),
+    PrmQueryWithNames(String, Vec<(String, Column)>, Consistency),
  	Prepare(String),
 	Execute(Vec<u8>, Vec<Column>, Consistency),
 	Batch(Vec<BatchQuery>, Consistency)
@@ -75,7 +76,7 @@ impl Request {
     match *self {
       	Request::Startup(_) => 0x01,
       	Request::Options => 0x05,
-      	Request::Query(_, _) | Request::PrmQuery(_, _, _)  => 0x07,
+      	Request::Query(_, _) | Request::PrmQuery(_, _, _) | Request::PrmQueryWithNames(_, _, _)  => 0x07,
 		Request::Prepare(_) => 0x09,
 		Request::Execute(_, _, _) => 0x0A,
 		Request::Batch(_, _) => 0x0D

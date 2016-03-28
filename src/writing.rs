@@ -64,6 +64,19 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 
 				write_values(&mut buf, values);
 			}
+            Request::PrmQueryWithNames(ref query, ref named_values, ref consistency) => {
+                //println!("query is {}", query);
+                try!(buf.write_i32::<BigEndian>(query.len() as i32));
+                try!(Write::write(&mut buf, query.as_bytes()));
+                try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
+
+                try!(WriteBytesExt::write_u8(&mut buf, 0 | QueryFlag::Values as u8 | QueryFlag::WithNamesForValues as u8));
+
+
+                try!(buf.write_u16::<BigEndian>(named_values.len() as u16));
+
+                write_named_values(&mut buf, named_values);
+            }
 			Request::Prepare(ref query) => {
 				try!(buf.write_i32::<BigEndian>(query.len() as i32));
 				try!(Write::write(&mut buf, query.as_bytes()));
@@ -123,7 +136,7 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 	try!(self.write(buf.as_slice()));
 
 	Ok(())
-}
+    }
 }
 
 fn write_values(buf: &mut Vec<u8>, values: &Vec<Column>) -> Result<()> {
@@ -132,6 +145,16 @@ fn write_values(buf: &mut Vec<u8>, values: &Vec<Column>) -> Result<()> {
 		write_value(buf, col);
 	}
 	Ok(())
+}
+
+fn write_named_values(buf: &mut Vec<u8>, named_values: &Vec<(String, Column)>) -> Result<()> {
+    for &(ref name, ref col) in named_values.iter() {
+        try!(buf.write_u16::<BigEndian>(name.len() as u16));
+        try!(Write::write(buf, name.as_bytes()));
+        try!(buf.write_i32::<BigEndian>(value_size(col) as i32));
+        write_value(buf, col);
+    }
+    Ok(())
 }
 
 fn value_size(value: &Column) -> usize {

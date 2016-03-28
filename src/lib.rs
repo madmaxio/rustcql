@@ -53,41 +53,48 @@ pub struct Connection {
 }
 
 impl Connection {
-  pub fn query(&mut self, query: String, consistency: Consistency) -> Result<Response> {
-    let message = Request::Query(query, consistency);
-    try!(self.buf.write_message(message));
-    try!(self.buf.flush());
+    pub fn query(&mut self, query: String, consistency: Consistency) -> Result<Response> {
+        let message = Request::Query(query, consistency);
+        try!(self.buf.write_message(message));
+        try!(self.buf.flush());
 
-    Ok(try!(self.buf.read_message()))
-  }
-  pub fn prm_query(&mut self, query: String, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
-    let message = Request::PrmQuery(query, values, consistency);
-    try!(self.buf.write_message(message));
-    try!(self.buf.flush());
+        Ok(try!(self.buf.read_message()))
+    }
+    pub fn prm_query(&mut self, query: String, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
+        let message = Request::PrmQuery(query, values, consistency);
+        try!(self.buf.write_message(message));
+        try!(self.buf.flush());
 
-    Ok(try!(self.buf.read_message()))
-  }
-  pub fn prepare(&mut self, query: String) -> Result<Response> {
-	  let message = Request::Prepare(query);
-	  try!(self.buf.write_message(message));
-	  try!(self.buf.flush());
+        Ok(try!(self.buf.read_message()))
+    }
+    pub fn prm_query_with_names(&mut self, query: String, named_values: Vec<(String, Column)>, consistency: Consistency) -> Result<Response> {
+        let message = Request::PrmQueryWithNames(query, named_values, consistency);
+        try!(self.buf.write_message(message));
+        try!(self.buf.flush());
 
-	  Ok(try!(self.buf.read_message()))
-  }
-  pub fn execute(&mut self, id: Vec<u8>, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
-	  let message = Request::Execute(id, values, consistency);
-	  try!(self.buf.write_message(message));
-	  try!(self.buf.flush());
+        Ok(try!(self.buf.read_message()))
+    }
+    pub fn prepare(&mut self, query: String) -> Result<Response> {
+        let message = Request::Prepare(query);
+        try!(self.buf.write_message(message));
+        try!(self.buf.flush());
 
-	  Ok(try!(self.buf.read_message()))
-  }
-  pub fn execute_batch(&mut self, queries: Vec<BatchQuery>, consistency: Consistency) -> Result<Response> {
-    let message = Request::Batch(queries, consistency);
-    try!(self.buf.write_message(message));
-    try!(self.buf.flush());
+        Ok(try!(self.buf.read_message()))
+    }
+    pub fn execute(&mut self, id: Vec<u8>, values: Vec<Column>, consistency: Consistency) -> Result<Response> {
+        let message = Request::Execute(id, values, consistency);
+        try!(self.buf.write_message(message));
+        try!(self.buf.flush());
 
-    Ok(try!(self.buf.read_message()))
-  }
+        Ok(try!(self.buf.read_message()))
+    }
+    pub fn execute_batch(&mut self, queries: Vec<BatchQuery>, consistency: Consistency) -> Result<Response> {
+        let message = Request::Batch(queries, consistency);
+        try!(self.buf.write_message(message));
+        try!(self.buf.flush());
+
+        Ok(try!(self.buf.read_message()))
+    }
 }
 
 
@@ -120,25 +127,21 @@ pub fn connect(addr: String) -> Result<Connection> {
 }
 
 #[test]
-#[ignore]
 fn connect_and_query() {
-  let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
+    let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
 
-  let result = conn.query("DROP KEYSPACE IF EXISTS testing".to_string(), Consistency::Quorum);
-  println!("Result of DROP KEYSPACE was {:?}", result);
+    let result = conn.query("DROP KEYSPACE IF EXISTS testing".to_string(), Consistency::Quorum);
+    println!("Result of DROP KEYSPACE was {:?}", result);
 
-  let query = "CREATE KEYSPACE testing
+    let query = "CREATE KEYSPACE testing
                WITH replication = {
                  'class' : 'SimpleStrategy',
                  'replication_factor' : 1
                }".to_string();
-  let result = conn.query(query, Consistency::Quorum);
-  println!("Result of CREATE KEYSPACE was {:?}", result);
+    let result = conn.query(query, Consistency::Quorum);
+    println!("Result of CREATE KEYSPACE was {:?}", result);
 
-  let result = conn.query("USE testing".to_string(), Consistency::Quorum);
-  println!("Result of USE was {:?}", result);
-
-  let query = "CREATE TABLE users (
+    let query = "CREATE TABLE testing.users (
     user_id varchar PRIMARY KEY,
     first varchar,
     last varchar,
@@ -146,14 +149,28 @@ fn connect_and_query() {
     height float
     )".to_string();
 
-  let result = conn.query(query, Consistency::Quorum);
-  println!("Result of CREATE TABLE was {:?}", result);
+    let result = conn.query(query, Consistency::Quorum);
+    println!("Result of CREATE TABLE was {:?}", result);
 
-  let query = "INSERT INTO users (user_id, first, last, age, height)
+    let query = "INSERT INTO testing.users (user_id, first, last, age, height)
                VALUES ('jsmith', 'John', 'Smith', 42, 12.1);".to_string();
-  let result = conn.query(query, Consistency::Quorum);
-  println!("Result of INSERT was {:?}", result);
+    let result = conn.query(query, Consistency::Quorum);
+    println!("Result of INSERT was {:?}", result);
 
-  let result = conn.query("SELECT * FROM users".to_string(), Consistency::Quorum);
-  println!("Result of SELECT was {:?}", result);
+    let result = conn.query("SELECT * FROM testing.users".to_string(), Consistency::Quorum);
+    println!("Result of SELECT was {:?}", result);
+
+    let query = "SELECT * FROM testing.users where user_id = ?".to_string();
+    let values = vec![shared::Column::String("jsmith".to_string())];
+
+    let result = conn.prm_query(query, values, Consistency::Quorum).unwrap();
+
+    println!("Result of prm_query was {:?}", result);
+
+    let query = "SELECT * FROM testing.users where user_id = :user_id".to_string();
+    let named_values = vec![("user_id".to_string(), shared::Column::String("jsmith".to_string()))];
+
+    let result = conn.prm_query_with_names(query, named_values, Consistency::Quorum).unwrap();
+
+    println!("Result of prm_query_with_names was {:?}", result);
 }
