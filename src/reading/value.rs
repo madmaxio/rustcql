@@ -39,7 +39,7 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 		ColumnType::Timeuuid => {
 			let bytes = read_fixed(buf, len as usize);
 			let uuid = Uuid::from_bytes(bytes.as_slice()).unwrap();
-			Column::String(uuid.to_hyphenated_string())
+			Column::String(uuid.hyphenated().to_string())
 		}
 		ColumnType::Timestamp =>
 			Column::Timestamp(get_dt(buf.read_i64::<BigEndian>().unwrap())),
@@ -132,7 +132,7 @@ fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column
 		ColumnType::Bigint => Column::Bigint(buf.read_i64::<BigEndian>().unwrap()),
 		ColumnType::Timeuuid => {
 			let bytes = read_fixed(buf, len as usize);
-			Column::String(Uuid::from_bytes(bytes.as_slice()).unwrap().to_hyphenated_string())
+			Column::String(Uuid::from_bytes(bytes.as_slice()).unwrap().hyphenated().to_string())
 		}
 		ColumnType::Timestamp =>
 			Column::Timestamp(get_dt(buf.read_i64::<BigEndian>().unwrap())),
