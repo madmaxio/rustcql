@@ -3,8 +3,6 @@ use core::cmp::PartialEq;
 
 
 
-use chrono::*;
-
 pub static CQL_BINARY_PROTOCOL_VERSION:u8 = 0x04;
 
 
@@ -178,7 +176,7 @@ pub fn to_column_type(value: u16) -> ColumnType {
 	}
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Column {
 	None,
 	String(String),
@@ -186,7 +184,7 @@ pub enum Column {
 	Bigint(i64),
 	Float(f32),
 	Double(f64),
-	Timestamp(DateTime<UTC>),
+	Timestamp(i64),
 	Set(Vec<Column>),
 	List(Vec<Column>),
 	Map(Vec<(Column, Column)>)
@@ -223,7 +221,7 @@ impl Column {
 				_ => None
 			}
 	}
-	pub fn get_datetime(&self) -> Option<DateTime<UTC>> {
+	pub fn get_timestamp(&self) -> Option<i64> {
 		match *self {
 				Column::Timestamp(ref val) => Some(*val),
 				_ => None

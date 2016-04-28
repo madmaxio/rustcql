@@ -177,7 +177,7 @@ fn write_value(buf: &mut Vec<u8>, value: &Column) -> Result<()> {
 		&Column::Bigint(ref v) => {try!(buf.write_i64::<BigEndian>(*v));}
 		&Column::Float(ref v) => {try!(buf.write_f32::<BigEndian>(*v));}
 		&Column::Double(ref v) => {try!(buf.write_f64::<BigEndian>(*v));}
-		&Column::Timestamp(ref v) => {try!(buf.write_i64::<BigEndian>((*v).timestamp() * 1000));}
+		&Column::Timestamp(ref v) => {try!(buf.write_i64::<BigEndian>(*v));}
 		&Column::Set(ref v) | &Column::List(ref v) => {
 			try!(buf.write_i32::<BigEndian>((*v).len() as i32));
 			for value in (*v).iter() {

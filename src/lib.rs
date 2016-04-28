@@ -1,10 +1,12 @@
 #![feature(convert)]
+#![feature(custom_derive, plugin)]
+#![plugin(serde_macros)]
 
 extern crate core;
 extern crate bufstream;
-extern crate chrono;
 extern crate byteorder;
 extern crate uuid;
+extern crate serde;
 
 pub mod shared;
 

@@ -14,5 +14,7 @@ license = "MIT"
 
 bufstream = "0.1.1"
 byteorder = "0.5.1"
-chrono = "0.2.21"
 uuid = "0.2.0"
+serde = "0.7.0"
+serde_json = "0.7.0"
+serde_macros = "0.7.2"

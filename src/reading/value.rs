@@ -1,7 +1,5 @@
 use std::io::Read;
 
-use chrono::*;
-
 use uuid::Uuid;
 
 use byteorder::{
@@ -42,7 +40,7 @@ pub fn read_column_value(buf: &mut Read, data_type: ColumnType, collection_spec:
 			Column::String(uuid.hyphenated().to_string())
 		}
 		ColumnType::Timestamp =>
-			Column::Timestamp(get_dt(buf.read_i64::<BigEndian>().unwrap())),
+			Column::Timestamp(buf.read_i64::<BigEndian>().unwrap()),
 
 		ColumnType::Set => {
 
@@ -135,17 +133,11 @@ fn read_collection_column_value(buf: &mut Read, data_type: ColumnType) -> Column
 			Column::String(Uuid::from_bytes(bytes.as_slice()).unwrap().hyphenated().to_string())
 		}
 		ColumnType::Timestamp =>
-			Column::Timestamp(get_dt(buf.read_i64::<BigEndian>().unwrap())),
+			Column::Timestamp(buf.read_i64::<BigEndian>().unwrap()),
 		_ => {
 			let bytes = read_fixed(buf, len as usize);
 			Column::String(String::from_utf8(bytes).unwrap())
 		}
 	}
 
-}
-
-fn get_dt(ts: i64) -> DateTime<UTC> {
-	let s = (ts / 1000) as i64;
-	let naive = NaiveDateTime::from_timestamp(s, 0);
-	DateTime::from_utc(naive, UTC)
 }
