@@ -1,7 +1,7 @@
 [package]
 
 name = "rustcql"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["Maxim Baranov <sprayrules@gmail.com>"]
 
 description = "Rust Cassandra Client (CQL Binary Protocol v4)"
@@ -12,9 +12,9 @@ license = "MIT"
 
 [dependencies]
 
-bufstream = "0.1.1"
+bufstream = "0.1.2"
 byteorder = "0.5.1"
-uuid = "0.2.0"
-serde = "0.7.0"
+uuid = "0.2.2"
+serde = "0.7.4"
 serde_json = "0.7.0"
-serde_macros = "0.7.2"
+serde_macros = "0.7.4"
