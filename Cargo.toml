@@ -12,9 +12,9 @@ license = "MIT"
 
 [dependencies]
 
-bufstream = "0.1.2"
-byteorder = "0.5.3"
-serde = "0.7.11"
-serde_json = "0.7.4"
-serde_macros = "0.7.11"
-uuid = "0.2.2"
+bufstream = "*"
+byteorder = "*"
+serde = "*"
+serde_json = "*"
+serde_macros = "*"
+uuid = "*"

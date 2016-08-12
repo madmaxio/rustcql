@@ -6,6 +6,78 @@ use core::cmp::PartialEq;
 pub static CQL_BINARY_PROTOCOL_VERSION:u8 = 0x04;
 
 
+
+pub enum Opcode {
+    Error = 0x00,
+    Startup = 0x01,
+    Ready = 0x02,
+    Authenticate = 0x03,
+    Options = 0x05,
+    Supported = 0x06,
+    Query = 0x07,
+    Result = 0x08,
+    Prepare = 0x09,
+    Execute = 0x0A,
+    Register = 0x0B,
+    Event = 0x0C,
+    Batch = 0x0D,
+    AuthChallenge = 0x0E,
+    AuthResponse = 0x0F,
+    AuthSuccess = 0x10,
+    UnknownOpcode
+}
+
+pub fn to_opcode(value: u8) -> Opcode {
+    match value {
+        0x00 => Opcode::Error,
+        0x01 => Opcode::Startup,
+        0x02 => Opcode::Ready,
+        0x03 => Opcode::Authenticate,
+        0x05 => Opcode::Options,
+        0x06 => Opcode::Supported,
+        0x07 => Opcode::Query,
+        0x08 => Opcode::Result,
+        0x09 => Opcode::Prepare,
+        0x0A => Opcode::Execute,
+        0x0B => Opcode::Register,
+        0x0C => Opcode::Event,
+        0x0D => Opcode::Batch,
+        0x0E => Opcode::AuthChallenge,
+        0x0F => Opcode::AuthResponse,
+        0x10 => Opcode::AuthSuccess,
+        _ => Opcode::UnknownOpcode
+    }
+}
+
+pub enum FrameFlag {
+    None = 0x00,
+    Compression = 0x01,
+    Tracing = 0x02,
+    CustomPayload = 0x04,
+    Warning = 0x08,
+    UseBeta = 0x10
+}
+
+pub enum ResultType {
+    Void = 0x0001,
+    Rows = 0x0002,
+    SetKeyspace = 0x0003,
+    Prepared = 0x0004,
+    Schema_change = 0x0005,
+    UnknownResult
+}
+
+pub fn to_result_type(value: u32) -> ResultType {
+    match value {
+        0x0001 => ResultType::Void,
+        0x0002 => ResultType::Rows,
+        0x0003 => ResultType::SetKeyspace,
+        0x0004 => ResultType::Prepared,
+        0x0005 => ResultType::Schema_change,
+        _ => ResultType::UnknownResult
+    }
+}
+
 pub enum QueryFlag {
 	None = 0x00,
 	Values = 0x01,

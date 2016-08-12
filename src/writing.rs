@@ -10,6 +10,7 @@ use byteorder::{WriteBytesExt, BigEndian};
 use shared::{
 	CQL_BINARY_PROTOCOL_VERSION,
 	Request,
+    FrameFlag,
 	QueryFlag,
 	BatchType,
 	BatchFlag,
@@ -28,7 +29,7 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 	let mut header = Vec::new();
 
 	try!(WriteBytesExt::write_u8(&mut header, CQL_BINARY_PROTOCOL_VERSION));
-	try!(WriteBytesExt::write_u8(&mut header, 0x00));
+	try!(WriteBytesExt::write_u8(&mut header, FrameFlag::None as u8));
 	try!(WriteBytesExt::write_u16::<BigEndian>(&mut header, 1));
 	try!(WriteBytesExt::write_u8(&mut header, message.opcode()));
 
@@ -49,7 +50,7 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 				try!(buf.write_i32::<BigEndian>(query.len() as i32));
 				try!(Write::write(&mut buf, query.as_bytes()));
 				try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
-				try!(WriteBytesExt::write_u8(&mut buf, 0 as u8));
+				try!(WriteBytesExt::write_u8(&mut buf, QueryFlag::None as u8));
 			}
 			Request::PrmQuery(ref query, ref values, ref consistency) => {
 				//println!("query is {}", query);
@@ -57,7 +58,7 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 				try!(Write::write(&mut buf, query.as_bytes()));
 				try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
 
-				try!(WriteBytesExt::write_u8(&mut buf, 0 | QueryFlag::Values as u8));
+				try!(WriteBytesExt::write_u8(&mut buf, QueryFlag::Values as u8));
 
 
 				try!(buf.write_u16::<BigEndian>(values.len() as u16));
@@ -70,7 +71,7 @@ fn write_message(&mut self, message: Request) -> Result<()> {
                 try!(Write::write(&mut buf, query.as_bytes()));
                 try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
 
-                try!(WriteBytesExt::write_u8(&mut buf, 0 | QueryFlag::Values as u8 | QueryFlag::WithNamesForValues as u8));
+                try!(WriteBytesExt::write_u8(&mut buf, QueryFlag::Values as u8 | QueryFlag::WithNamesForValues as u8));
 
 
                 try!(buf.write_u16::<BigEndian>(named_values.len() as u16));
@@ -86,7 +87,7 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 				try!(Write::write(&mut buf, id));
 				try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
 
-				try!(WriteBytesExt::write_u8(&mut buf, 0 | QueryFlag::Values as u8));
+				try!(WriteBytesExt::write_u8(&mut buf, QueryFlag::Values as u8));
 
 
 				try!(buf.write_u16::<BigEndian>(values.len() as u16));

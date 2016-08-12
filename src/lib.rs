@@ -128,7 +128,7 @@ pub fn connect(addr: String) -> Result<Connection> {
   }
 }
 
-#[ignore]
+//#[ignore]
 #[test]
 fn connect_and_query() {
     let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
