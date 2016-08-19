@@ -97,6 +97,37 @@ impl Connection {
 
         Ok(try!(self.buf.read_message()))
     }
+
+
+
+    pub fn paged_query(&mut self, query: String, consistency: Consistency, result_page_size: i32, paging_state: Option<Vec<u8>>) -> Result<Response> {
+        let message = Request::PagedQuery(query, consistency, result_page_size, paging_state);
+        try!(self.buf.write_message(message));
+        try!(self.buf.flush());
+
+        Ok(try!(self.buf.read_message()))
+    }
+    pub fn paged_prm_query(&mut self, query: String, values: Vec<Column>, consistency: Consistency, result_page_size: i32, paging_state: Option<Vec<u8>>) -> Result<Response> {
+        let message = Request::PagedPrmQuery(query, values, consistency, result_page_size, paging_state);
+        try!(self.buf.write_message(message));
+        try!(self.buf.flush());
+
+        Ok(try!(self.buf.read_message()))
+    }
+    pub fn paged_prm_query_with_names(&mut self, query: String, named_values: Vec<(String, Column)>, consistency: Consistency, result_page_size: i32, paging_state: Option<Vec<u8>>) -> Result<Response> {
+        let message = Request::PagedPrmQueryWithNames(query, named_values, consistency, result_page_size, paging_state);
+        try!(self.buf.write_message(message));
+        try!(self.buf.flush());
+
+        Ok(try!(self.buf.read_message()))
+    }
+    pub fn paged_execute(&mut self, id: Vec<u8>, values: Vec<Column>, consistency: Consistency, result_page_size: i32, paging_state: Option<Vec<u8>>) -> Result<Response> {
+        let message = Request::PagedExecute(id, values, consistency, result_page_size, paging_state);
+        try!(self.buf.write_message(message));
+        try!(self.buf.flush());
+
+        Ok(try!(self.buf.read_message()))
+    }
 }
 
 

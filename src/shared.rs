@@ -138,7 +138,12 @@ pub enum Request {
     PrmQueryWithNames(String, Vec<(String, Column)>, Consistency),
  	Prepare(String),
 	Execute(Vec<u8>, Vec<Column>, Consistency),
-	Batch(Vec<BatchQuery>, Consistency)
+	Batch(Vec<BatchQuery>, Consistency),
+
+    PagedQuery(String, Consistency, i32, Option<Vec<u8>>),
+    PagedPrmQuery(String, Vec<Column>, Consistency, i32, Option<Vec<u8>>),
+    PagedPrmQueryWithNames(String, Vec<(String, Column)>, Consistency, i32, Option<Vec<u8>>),
+    PagedExecute(Vec<u8>, Vec<Column>, Consistency, i32, Option<Vec<u8>>)
 }
 
 impl Request {
@@ -146,9 +151,11 @@ impl Request {
     match *self {
       	Request::Startup(_) => 0x01,
       	Request::Options => 0x05,
-      	Request::Query(_, _) | Request::PrmQuery(_, _, _) | Request::PrmQueryWithNames(_, _, _)  => 0x07,
+      	Request::Query(_, _) | Request::PrmQuery(_, _, _) | Request::PrmQueryWithNames(_, _, _) |
+        Request::PagedQuery(_, _, _, _) | Request::PagedPrmQuery(_, _, _, _, _) | Request::PagedPrmQueryWithNames(_, _, _, _, _)
+        => 0x07,
 		Request::Prepare(_) => 0x09,
-		Request::Execute(_, _, _) => 0x0A,
+		Request::Execute(_, _, _) | Request::PagedExecute(_, _, _, _, _) => 0x0A,
 		Request::Batch(_, _) => 0x0D
     }
   }

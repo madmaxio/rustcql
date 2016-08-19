@@ -129,6 +129,51 @@ fn write_message(&mut self, message: Request) -> Result<()> {
 				try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
 				try!(WriteBytesExt::write_u8(&mut buf, BatchFlag::None as u8));
 			}
+
+            Request::PagedQuery(ref query, ref consistency, ref result_page_size, ref paging_state) => {
+                try!(buf.write_i32::<BigEndian>(query.len() as i32));
+                try!(Write::write(&mut buf, query.as_bytes()));
+                try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
+                try!(WriteBytesExt::write_u8(&mut buf, QueryFlag::None as u8));
+            }
+            Request::PagedPrmQuery(ref query, ref values, ref consistency, ref result_page_size, ref paging_state) => {
+                //println!("query is {}", query);
+                try!(buf.write_i32::<BigEndian>(query.len() as i32));
+                try!(Write::write(&mut buf, query.as_bytes()));
+                try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
+
+                try!(WriteBytesExt::write_u8(&mut buf, QueryFlag::Values as u8));
+
+
+                try!(buf.write_u16::<BigEndian>(values.len() as u16));
+
+                write_values(&mut buf, values);
+            }
+            Request::PagedPrmQueryWithNames(ref query, ref named_values, ref consistency, ref result_page_size, ref paging_state) => {
+                //println!("query is {}", query);
+                try!(buf.write_i32::<BigEndian>(query.len() as i32));
+                try!(Write::write(&mut buf, query.as_bytes()));
+                try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
+
+                try!(WriteBytesExt::write_u8(&mut buf, QueryFlag::Values as u8 | QueryFlag::WithNamesForValues as u8));
+
+
+                try!(buf.write_u16::<BigEndian>(named_values.len() as u16));
+
+                write_named_values(&mut buf, named_values);
+            }
+            Request::PagedExecute(ref id, ref values, ref consistency, ref result_page_size, ref paging_state) => {
+                try!(buf.write_u16::<BigEndian>(id.len() as u16));
+                try!(Write::write(&mut buf, id));
+                try!(buf.write_u16::<BigEndian>((*consistency).clone() as u16));
+
+                try!(WriteBytesExt::write_u8(&mut buf, QueryFlag::Values as u8));
+
+
+                try!(buf.write_u16::<BigEndian>(values.len() as u16));
+
+                write_values(&mut buf, values);
+            }
 			_ => ()
 		}
 
