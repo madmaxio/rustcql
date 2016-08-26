@@ -78,6 +78,13 @@ pub fn to_result_type(value: u32) -> ResultType {
     }
 }
 
+pub enum RowsFlag {
+    None = 0x0000,
+    GlobalTablesSpec = 0x0001,
+    HasMorePages = 0x0002,
+    NoMetadata = 0x0004
+}
+
 pub enum QueryFlag {
 	None = 0x00,
 	Values = 0x01,
