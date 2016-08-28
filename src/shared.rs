@@ -58,7 +58,7 @@ pub enum FrameFlag {
     UseBeta = 0x10
 }
 
-pub enum ResultK {
+pub enum ResultKind {
     Void = 0x0001,
     Rows = 0x0002,
     SetKeyspace = 0x0003,
@@ -67,14 +67,14 @@ pub enum ResultK {
     UnknownResult
 }
 
-pub fn to_result_type(value: u32) -> ResultType {
+pub fn to_result_kind(value: u32) -> ResultKind {
     match value {
-        0x0001 => ResultType::Void,
-        0x0002 => ResultType::Rows,
-        0x0003 => ResultType::SetKeyspace,
-        0x0004 => ResultType::Prepared,
-        0x0005 => ResultType::Schema_change,
-        _ => ResultType::UnknownResult
+        0x0001 => ResultKind::Void,
+        0x0002 => ResultKind::Rows,
+        0x0003 => ResultKind::SetKeyspace,
+        0x0004 => ResultKind::Prepared,
+        0x0005 => ResultKind::Schema_change,
+        _ => ResultKind::UnknownResult
     }
 }
 

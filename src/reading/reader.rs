@@ -17,8 +17,8 @@ use shared::{
 	Row,
     Opcode,
     to_opcode,
-    ResultType,
-    to_result_type,
+    ResultKind,
+    to_result_kind,
     RowsFlag
 };
 
@@ -83,10 +83,10 @@ fn read_error_response(buf: &mut Read) -> Result<Response> {
 }
 
 fn read_result(buf: &mut Read) -> Result<Response> {
-	let result_type = to_result_type(try!(buf.read_u32::<BigEndian>()));
+	let result_kind = to_result_kind(try!(buf.read_u32::<BigEndian>()));
 
-	let body = match result_type {
-			ResultType::Rows => {
+	let body = match result_kind {
+			ResultKind::Rows => {
 
                 let flags = try!(buf.read_i32::<BigEndian>());
 
@@ -130,13 +130,13 @@ fn read_result(buf: &mut Read) -> Result<Response> {
                 }
                 ResultBody::Rows(rows, paging_state)
 			}
-			ResultType::SetKeyspace => {
+            ResultKind::SetKeyspace => {
 				let len = try!(buf.read_u16::<BigEndian>());
 				let string_bytes = read_fixed(buf, len as usize);
 				let name = String::from_utf8(string_bytes).unwrap();
 				ResultBody::SetKeyspace(name)
 			}
-			ResultType::Prepared => {
+            ResultKind::Prepared => {
 				let len = try!(buf.read_u16::<BigEndian>());
 				let id = read_fixed(buf, len as usize);
 				let flags = try!(buf.read_i32::<BigEndian>());
@@ -166,7 +166,7 @@ fn read_result(buf: &mut Read) -> Result<Response> {
 				let column_specs = read_column_specs(buf, columns_count);
 				ResultBody::Prepared(id)
 			}
-			ResultType::Schema_change => {
+            ResultKind::Schema_change => {
                 // dedup this - map over range?
                 let len = try!(buf.read_u16::<BigEndian>());
                 let string_bytes = read_fixed(buf, len as usize);

@@ -35,7 +35,8 @@ use shared::{
   Consistency,
   Response,
   BatchQuery,
-  Column
+  Column,
+    ResultBody
 };
 
 
@@ -250,16 +251,13 @@ fn test_paging() {
         println!("Result of prm_query was {:?}", response);
     }
 
-    let query = "SELECT * FROM testing.users".to_string();
+    let query = "SELECT * FROM testing.users where user_id > ?".to_string();
 
-    let response = conn.paged_query(query, Consistency::Quorum, 10, None).unwrap();
+    let values = vec![shared::Column::Bigint(1)];
 
-    if let Response::Result(payload) = response {
-        if let ResultBody::Rows(rows, paging_state) = payload {
+    let response = conn.paged_prm_query(query.clone(), values.clone(), Consistency::Quorum, 10, None).unwrap();
 
-        }
-    }
+    println!("Result of paged_prm_query was {:?}", response);
 
 
-    //println!("Result of paged_query was {:?}", response);
 }
