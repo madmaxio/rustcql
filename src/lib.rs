@@ -45,7 +45,7 @@ use writing::WriteMessage;
 
 fn startup_request() -> Request {
   let mut body = HashMap::new();
-  body.insert("CQL_VERSION".to_string(), "3.4.0".to_string());
+  body.insert("CQL_VERSION".to_string(), "3.4.2".to_string());
 
   Request::Startup(body)
 }
@@ -159,21 +159,21 @@ pub fn connect(addr: String) -> Result<Connection> {
   }
 }
 
-//#[ignore]
+#[ignore]
 #[test]
-fn connect_and_query() {
+fn test_query() {
     let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
 
-    let result = conn.query("DROP KEYSPACE IF EXISTS testing".to_string(), Consistency::Quorum);
-    println!("Result of DROP KEYSPACE was {:?}", result);
+    let response = conn.query("DROP KEYSPACE IF EXISTS testing".to_string(), Consistency::Quorum);
+    println!("Result of DROP KEYSPACE was {:?}", response);
 
     let query = "CREATE KEYSPACE testing
                WITH replication = {
                  'class' : 'SimpleStrategy',
                  'replication_factor' : 1
                }".to_string();
-    let result = conn.query(query, Consistency::Quorum);
-    println!("Result of CREATE KEYSPACE was {:?}", result);
+    let response = conn.query(query, Consistency::Quorum);
+    println!("Result of CREATE KEYSPACE was {:?}", response);
 
     let query = "CREATE TABLE testing.users (
     user_id varchar PRIMARY KEY,
@@ -183,28 +183,83 @@ fn connect_and_query() {
     height float
     )".to_string();
 
-    let result = conn.query(query, Consistency::Quorum);
-    println!("Result of CREATE TABLE was {:?}", result);
+    let response = conn.query(query, Consistency::Quorum);
+    println!("Result of CREATE TABLE was {:?}", response);
 
     let query = "INSERT INTO testing.users (user_id, first, last, age, height)
                VALUES ('jsmith', 'John', 'Smith', 42, 12.1);".to_string();
-    let result = conn.query(query, Consistency::Quorum);
-    println!("Result of INSERT was {:?}", result);
+    let response = conn.query(query, Consistency::Quorum);
+    println!("Result of INSERT was {:?}", response);
 
-    let result = conn.query("SELECT * FROM testing.users".to_string(), Consistency::Quorum);
-    println!("Result of SELECT was {:?}", result);
+    let response = conn.query("SELECT * FROM testing.users".to_string(), Consistency::Quorum);
+    println!("Result of SELECT was {:?}", response);
 
     let query = "SELECT * FROM testing.users where user_id = ?".to_string();
     let values = vec![shared::Column::String("jsmith".to_string())];
 
-    let result = conn.prm_query(query, values, Consistency::Quorum).unwrap();
+    let response = conn.prm_query(query, values, Consistency::Quorum).unwrap();
 
-    println!("Result of prm_query was {:?}", result);
+    println!("Result of prm_query was {:?}", response);
 
     let query = "SELECT * FROM testing.users where user_id = :user_id".to_string();
     let named_values = vec![("user_id".to_string(), shared::Column::String("jsmith".to_string()))];
 
-    let result = conn.prm_query_with_names(query, named_values, Consistency::Quorum).unwrap();
+    let response = conn.prm_query_with_names(query, named_values, Consistency::Quorum).unwrap();
 
-    println!("Result of prm_query_with_names was {:?}", result);
+    println!("Result of prm_query_with_names was {:?}", response);
+}
+
+#[test]
+fn test_paging() {
+    let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
+
+    let response = conn.query("DROP KEYSPACE IF EXISTS testing".to_string(), Consistency::Quorum);
+    println!("Result of DROP KEYSPACE was {:?}", response);
+
+    let query = "CREATE KEYSPACE testing
+               WITH replication = {
+                 'class' : 'SimpleStrategy',
+                 'replication_factor' : 1
+               }".to_string();
+    let response = conn.query(query, Consistency::Quorum);
+    println!("Result of CREATE KEYSPACE was {:?}", response);
+
+    let query = "CREATE TABLE testing.users (
+    user_id bigint PRIMARY KEY,
+    first varchar,
+    last varchar,
+    age int,
+    height float
+    )".to_string();
+
+    let response = conn.query(query, Consistency::Quorum);
+    println!("Result of CREATE TABLE was {:?}", response);
+
+    let query = "INSERT INTO testing.users (user_id, first, last, age, height)
+               VALUES ('jsmith', 'John', 'Smith', 42, 12.1);".to_string();
+    let response = conn.query(query, Consistency::Quorum);
+    println!("Result of INSERT was {:?}", response);
+
+    for i in 0..1000 {
+        let query = "INSERT INTO testing.users (user_id, first, last, age, height)
+               VALUES (?, 'John', 'Smith', 42, 12.1);".to_string();
+        let values = vec![shared::Column::Bigint(i)];
+
+        let response = conn.prm_query(query, values, Consistency::Quorum).unwrap();
+
+        println!("Result of prm_query was {:?}", response);
+    }
+
+    let query = "SELECT * FROM testing.users".to_string();
+
+    let response = conn.paged_query(query, Consistency::Quorum, 10, None).unwrap();
+
+    if let Response::Result(payload) = response {
+        if let ResultBody::Rows(rows, paging_state) = payload {
+
+        }
+    }
+
+
+    //println!("Result of paged_query was {:?}", response);
 }

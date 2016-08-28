@@ -58,7 +58,7 @@ pub enum FrameFlag {
     UseBeta = 0x10
 }
 
-pub enum ResultType {
+pub enum ResultK {
     Void = 0x0001,
     Rows = 0x0002,
     SetKeyspace = 0x0003,
@@ -182,7 +182,7 @@ pub enum Response {
 #[derive(Debug)]
 pub enum ResultBody {
   Void,
-  Rows(Vec<Row>),
+  Rows(Vec<Row>, Option<Vec<u8>>),
   SetKeyspace(String),
   Prepared(Vec<u8>),
   SchemaChange(String, String, String)

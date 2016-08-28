@@ -18,7 +18,8 @@ use shared::{
     Opcode,
     to_opcode,
     ResultType,
-    to_result_type
+    to_result_type,
+    RowsFlag
 };
 
 use reading::spec::read_column_specs;
@@ -86,8 +87,21 @@ fn read_result(buf: &mut Read) -> Result<Response> {
 
 	let body = match result_type {
 			ResultType::Rows => {
+
                 let flags = try!(buf.read_i32::<BigEndian>());
+
                 let columns_count = try!(buf.read_i32::<BigEndian>());
+
+                let mut paging_state: Option<Vec<u8>> = None;
+
+                if flags & RowsFlag::HasMorePages as i32 == RowsFlag::HasMorePages as i32 {
+
+                    println!("The flags are {}, and column count is {}", flags, columns_count);
+
+                    let len = try!(buf.read_i32::<BigEndian>());
+                    paging_state = Some(read_fixed(buf, len as usize));
+                }
+
                 //assume global column spec
                 let len = try!(buf.read_u16::<BigEndian>());
                 let bytes = read_fixed(buf, len as usize);
@@ -114,7 +128,7 @@ fn read_result(buf: &mut Read) -> Result<Response> {
                     }
                     rows.push(Row { columns: columns});
                 }
-                ResultBody::Rows(rows)
+                ResultBody::Rows(rows, paging_state)
 			}
 			ResultType::SetKeyspace => {
 				let len = try!(buf.read_u16::<BigEndian>());
