@@ -31,11 +31,11 @@ use std::collections::HashMap;
 use bufstream::BufStream;
 
 use shared::{
-  Request,
-  Consistency,
-  Response,
-  BatchQuery,
-  Column,
+    Request,
+    Consistency,
+    Response,
+    BatchQuery,
+    Column,
     ResultBody
 };
 
@@ -46,7 +46,7 @@ use writing::WriteMessage;
 
 fn startup_request() -> Request {
   let mut body = HashMap::new();
-  body.insert("CQL_VERSION".to_string(), "3.4.2".to_string());
+  body.insert("CQL_VERSION".to_string(), "3.4.3".to_string());
 
   Request::Startup(body)
 }
@@ -210,6 +210,7 @@ fn test_query() {
     println!("Result of prm_query_with_names was {:?}", response);
 }
 
+#[ignore]
 #[test]
 fn test_paging() {
     let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
@@ -226,24 +227,22 @@ fn test_paging() {
     println!("Result of CREATE KEYSPACE was {:?}", response);
 
     let query = "CREATE TABLE testing.users (
-    user_id bigint PRIMARY KEY,
+    super_key bigint,
+    user_id bigint,
     first varchar,
     last varchar,
     age int,
-    height float
+    height float,
+    PRIMARY KEY (super_key, user_id)
     )".to_string();
 
     let response = conn.query(query, Consistency::Quorum);
     println!("Result of CREATE TABLE was {:?}", response);
 
-    let query = "INSERT INTO testing.users (user_id, first, last, age, height)
-               VALUES ('jsmith', 'John', 'Smith', 42, 12.1);".to_string();
-    let response = conn.query(query, Consistency::Quorum);
-    println!("Result of INSERT was {:?}", response);
 
     for i in 0..1000 {
-        let query = "INSERT INTO testing.users (user_id, first, last, age, height)
-               VALUES (?, 'John', 'Smith', 42, 12.1);".to_string();
+        let query = "INSERT INTO testing.users (super_key, user_id, first, last, age, height)
+               VALUES (1, ?, 'John', 'Smith', 42, 12.1);".to_string();
         let values = vec![shared::Column::Bigint(i)];
 
         let response = conn.prm_query(query, values, Consistency::Quorum).unwrap();
@@ -251,13 +250,19 @@ fn test_paging() {
         println!("Result of prm_query was {:?}", response);
     }
 
-    let query = "SELECT * FROM testing.users where user_id > ?".to_string();
+    let query = "SELECT * FROM testing.users where super_key = 1 and user_id > ?".to_string();
 
     let values = vec![shared::Column::Bigint(1)];
 
-    let response = conn.paged_prm_query(query.clone(), values.clone(), Consistency::Quorum, 10, None).unwrap();
+    if let Response::Result(rb) = conn.paged_prm_query(query.clone(), values.clone(), Consistency::Quorum, 10, None).unwrap() {
 
-    println!("Result of paged_prm_query was {:?}", response);
+        if let ResultBody::Rows(rows, paging_state) = rb {
 
+            println!("Result of first paged_prm_query was {:?}", rows);
 
+            let response = conn.paged_prm_query(query.clone(), values.clone(), Consistency::Quorum, 10, paging_state).unwrap();
+
+            println!("Result of first paged_prm_query was {:?}", response);
+        }
+    }
 }

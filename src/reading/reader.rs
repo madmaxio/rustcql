@@ -96,7 +96,7 @@ fn read_result(buf: &mut Read) -> Result<Response> {
 
                 if flags & RowsFlag::HasMorePages as i32 == RowsFlag::HasMorePages as i32 {
 
-                    println!("The flags are {}, and column count is {}", flags, columns_count);
+                    //println!("The flags are {}, and column count is {}", flags, columns_count);
 
                     let len = try!(buf.read_i32::<BigEndian>());
                     paging_state = Some(read_fixed(buf, len as usize));
