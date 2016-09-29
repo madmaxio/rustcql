@@ -3,6 +3,7 @@
 #![plugin(serde_macros)]
 
 extern crate core;
+extern crate tokio_core;
 extern crate bufstream;
 extern crate byteorder;
 extern crate uuid;
@@ -160,7 +161,7 @@ pub fn connect(addr: String) -> Result<Connection> {
   }
 }
 
-#[ignore]
+//#[ignore]
 #[test]
 fn test_query() {
     let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
@@ -210,7 +211,7 @@ fn test_query() {
     println!("Result of prm_query_with_names was {:?}", response);
 }
 
-#[ignore]
+//#[ignore]
 #[test]
 fn test_paging() {
     let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
