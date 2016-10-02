@@ -262,7 +262,7 @@ pub fn to_column_type(value: u16) -> ColumnType {
 	}
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Column {
 	None,
 	String(String),
