@@ -10,6 +10,8 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::str::FromStr;
 
+
+use futures::Future;
 use tokio_core;
 use bufstream;
 use bufstream::BufStream;
@@ -39,21 +41,44 @@ macro_rules! t {
 }
 
 pub fn tokio_connect() {
-    let mut l = t!(Core::new());
+
+    let msg = startup_request();
+
+    let mut req = Vec::new();
+
+    req.write_message(msg);
+
+
+
+
+    let mut core = t!(Core::new());
+
     let addr = t!(SocketAddr::from_str("127.0.0.1:9042"));
 
-    let stream = tokio_core::net::TcpStream::connect(&addr, &l.handle());
-    let mut stream = t!(l.run(stream));
+    let socket = tokio_core::net::TcpStream::connect(&addr, &core.handle());
+
+
+
+    let request = socket.and_then(|socket| {
+        println!("connected");
+        tokio_core::io::write_all(socket, req)
+    });
+
+    let response = request.and_then(|(socket, _)| {
+        println!("data written");
+        tokio_core::io::read_to_end(socket, Vec::new())
+    });
+
+    println!("starting core run");
+
+    let (_, data) = core.run(response).unwrap();
+
+
+//    println!("response is {}", String::from_utf8_lossy(&data));
 
 
 
 
-    let startup_msg = startup_request();
-//    let mut buf = BufStream::new(stream);
-
-    t!(stream.write_message(startup_msg));
-
-    stream.flush();
 /*
 //    try!(buf.flush());
 
@@ -195,10 +220,10 @@ impl Connection {
 
 #[test]
 fn test_tokio() {
-    tokio_connect();
+//    tokio_connect();
 }
 
-//#[ignore]
+#[ignore]
 #[test]
 fn test_query() {
     let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
@@ -248,7 +273,7 @@ fn test_query() {
     println!("Result of prm_query_with_names was {:?}", response);
 }
 
-//#[ignore]
+#[ignore]
 #[test]
 fn test_paging() {
     let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();

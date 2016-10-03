@@ -2,6 +2,7 @@
 #![feature(custom_derive, plugin)]
 
 extern crate core;
+extern crate futures;
 extern crate tokio_core;
 extern crate bufstream;
 extern crate byteorder;

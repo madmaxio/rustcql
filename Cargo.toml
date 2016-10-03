@@ -12,7 +12,8 @@ license = "MIT"
 
 [dependencies]
 
-tokio-core = "=0.1"
+futures = "*"
+tokio-core = "*"
 bufstream = "=0.1.2"
 byteorder = "=0.5.3"
 uuid = "=0.3.1"
