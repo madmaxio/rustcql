@@ -66,15 +66,17 @@ pub fn tokio_connect() {
 
     let response = request.and_then(|(socket, _)| {
         println!("data written");
-        tokio_core::io::read_to_end(socket, Vec::new())
+        let q: [u8; 4] = [0; 4];
+        tokio_core::io::read_exact(socket, q)
     });
 
     println!("starting core run");
 
     let (_, data) = core.run(response).unwrap();
 
+    println!("hi");
 
-//    println!("response is {}", String::from_utf8_lossy(&data));
+    println!("response is {}", String::from_utf8_lossy(&data));
 
 
 
@@ -220,7 +222,7 @@ impl Connection {
 
 #[test]
 fn test_tokio() {
-//    tokio_connect();
+    tokio_connect();
 }
 
 #[ignore]
