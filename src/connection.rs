@@ -220,15 +220,16 @@ impl Connection {
     }
 }
 
+#[ignore]
 #[test]
 fn test_tokio() {
     tokio_connect();
 }
 
-#[ignore]
+//#[ignore]
 #[test]
 fn test_query() {
-    let mut conn = connect("127.0.0.1:9042".to_string()).unwrap();
+    let mut conn = connect("localhost:9042".to_string()).unwrap();
 
     let response = conn.query("DROP KEYSPACE IF EXISTS testing".to_string(), Consistency::Quorum);
     println!("Result of DROP KEYSPACE was {:?}", response);
